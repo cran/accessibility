@@ -5,117 +5,129 @@
 \title{Floating catchment area accessibility}
 \usage{
 floating_catchment_area(
-  data,
-  fca_metric,
-  orig_col,
-  dest_col,
-  population_col,
-  opportunity_col,
+  travel_matrix,
+  land_use_data,
+  opportunity,
+  travel_cost,
+  demand,
+  method,
   decay_function,
-  travel_cost_col = "travel_time"
+  group_by = character(0),
+  fill_missing_ids = TRUE
 )
 }
 \arguments{
-\item{data}{A \code{data.frame} with a travel cost matrix in long format,
-containing the columns with origin ids, destination ids, the travel cost
-between each origin-destination pair (this can be either in  terms of
-travel time, distance or monetary costs), and number of population and
-opportunities located in each origin and destination.}
+\item{travel_matrix}{A data frame. The travel matrix describing the costs
+(i.e. travel time, distance, monetary cost, etc.) between the origins and
+destinations in the study area. Must contain the columns \code{from_id}, \code{to_id}
+and any others specified in \code{travel_cost_col}.}
 
-\item{fca_metric}{A \code{string} indicating which floating catchment area
-accessibility measure to use. Options available: \code{"2SFCA"} and \code{"BFCA"}.
-More info in the details.}
+\item{land_use_data}{A data frame. The distribution of opportunities within
+the study area cells. Must contain the columns \code{id} and any others
+specified in \code{opportunity_col}.}
 
-\item{orig_col}{A \code{string} with the name of the column of origin ids.}
+\item{opportunity}{A string. The name of the column in \code{land_use_data}
+with the number of opportunities/resources/services to be considered when
+calculating accessibility levels.}
 
-\item{dest_col}{A \code{string} with the name of the column of destination ids.}
+\item{travel_cost}{A string. The name of the column in \code{travel_matrix}
+with the travel cost between origins and destinations. Defaults to
+\code{"travel_time"}.}
 
-\item{population_col}{A \code{string} with the name of the column of origin with
-population count.}
+\item{demand}{A string. The name of the column in \code{land_use_data} with the
+number of people in each origin that will be considered potential
+competitors. Defaults to \code{"population"}.}
 
-\item{opportunity_col}{A \code{string} indicating the name of the column with the
-number of opportunities / resources / services to be considered.}
+\item{method}{A string. Which floating catchment area measure to use.
+Current available options are \code{"2sfca"} and \code{"bfca"}. More info in the
+details.}
 
-\item{decay_function}{A \code{fuction} that converts travel cost (t_ij) into an
-impedance factor used to weight opportunities. For convenience, the package
-currently includes the following functions: \code{decay_bineary},
-\code{decay_exponential}, \code{decay_exponential} and \code{decay_power}.
-See the documentation of each decay function for more details.}
+\item{decay_function}{A \code{fuction} that converts travel cost into an
+impedance factor used to weight opportunities. This function should take a
+\code{numeric} vector and also return a \code{numeric} vector as output, with the
+same length as the input. For convenience, the package currently includes
+the following functions: \code{\link[=decay_binary]{decay_binary()}}, \code{\link[=decay_exponential]{decay_exponential()}},
+\code{\link[=decay_exponential]{decay_exponential()}} and \code{\link[=decay_power]{decay_power()}}. See the documentation of each
+decay function for more details.}
 
-\item{travel_cost_col}{A \code{string} with the name of the column with travel
-cost between origins and destinations. It can be either either travel time,
-distance or monetary costs. Defaults to \code{travel_ime}.}
+\item{group_by}{A \code{character} vector. When not \code{character(0)} (the default),
+indicates the \code{travel_matrix} columns that should be used to group the
+accessibility estimates by. For example, if \code{travel_matrix} includes a
+departure time column, that specifies the departure time of each entry in
+the data frame, passing \code{"departure_time"} to this parameter results in
+accessibility estimates grouped by origin and by departure time.}
+
+\item{fill_missing_ids}{A \code{logical}. When calculating grouped accessibility
+estimates (i.e. when \code{by_col} is not \code{NULL}), some combinations of groups
+and origins may be missing. For example, if a single trip can depart from
+origin \code{A} at 7:15am and reach destination \code{B} within 55 minutes, but no
+trips departing from \code{A} at 7:30am can be completed at all, this second
+combination will not be included in the output. When \code{TRUE} (the default),
+the function identifies which combinations would be left out and fills
+their respective accessibility values with 0, which incurs in a
+performance penalty.}
 }
 \value{
-A \code{data.table} object.
+A data frame containing the accessibility estimates for each
+origin/destination (depending if \code{active} is \code{TRUE} or \code{FALSE}) in the
+travel matrix.
 }
 \description{
-Calculates accessibility accounting for the competition of resources using one
-of the multiple accessibility metrics in the floating catchment area family.
-The function currently includes \verb{2SFCA} 2-Step Floating Catchment Area (Luo &
-Wang, 2003), and \code{BFCA} Balanced Floating Catchment Area (Paez et al. 2021).
-Accessibility can be calculated using multiple alternative decay functions
-passed through the \code{decay_function} parameter.
-}
-\section{2SFCA}{
-The 2SFCA measure was the first accessibility metric in the floating
-catchment area family. It was originally proposed by Luo & Wang (2003).
-}
+Calculates accessibility accounting for the competition of resources using a
+measure from the floating catchment area (FCA) family. Please see the
+details for the available FCA measures.
 
-\section{BFCA}{
-The balanced floating catchment area (BFCA) metric calculates accessibility
-accounting for competition effects while simultaneously correcting for issues
-of inflation of demand and service levels that are present in previous
-floating  catchment area measures. BFCA was  was originally proposed by Paez
-et al. (2019) and named in Pereira et al. (2021).
-\subsection{References:}{
-\itemize{
-\item Luo, W., & Wang, F. (2003). Measures of spatial accessibility to health
-care in a GIS environment: synthesis and a case study in the Chicago region.
-Environment and planning B: planning and design, 30(6), 865-884. \doi{10.1068/b29120}.
-\item Paez, A., Higgins, C. D., & Vivona, S. F. (2019). Demand and level of
-service inflation in Floating Catchment Area (FCA) methods. Plos one, 14(6),
-e0218773. \doi{10.1371/journal.pone.0218773}
-\item Pereira, R. H., Braga, C. K. V., Servo, L. M., Serra, B., Amaral, P.,
-Gouveia, N., & Paez, A. (2021). Geographic access to COVID-19 healthcare in
-Brazil using a balanced float catchment area approach. Social Science &
-Medicine, 273. \doi{10.1016/j.socscimed.2021.113773}
+This function is generic over any kind of numeric travel cost,
+such as distance, time and money.
 }
+\section{Details}{
+
+The package currently includes two built-in FCA measures:
+\itemize{
+\item 2SFCA - the 2-Step Floating Catchment Area measure was the first
+accessibility metric in the FCA family. It was originally proposed by
+\insertCite{luo2003measures;textual}{accessibility}.
+\item BFCA - the Balanced Floating Catchment Area measure calculates
+accessibility accounting for competition effects while simultaneously
+correcting for issues of inflation of demand and service levels that are
+present in other FCA measures. It was originally proposed by
+\insertCite{paez2019demand;textual}{accessibility} and named in
+\insertCite{pereira2021geographic;textual}{accessibility}.
 }
 }
 
 \examples{
-library(accessibility)
-
-# load a travel time matrix data in long format
-data_path <- system.file("extdata/ttm_bho.rds", package = "accessibility")
-ttm <- readRDS(data_path)
+data_dir <- system.file("extdata", package = "accessibility")
+travel_matrix <- readRDS(file.path(data_dir, "travel_matrix.rds"))
+land_use_data <- readRDS(file.path(data_dir, "land_use_data.rds"))
 
 # 2SFCA with a step decay function
 df <- floating_catchment_area(
-       data = ttm,
-       fca_metric = '2SFCA',
-       orig_col = 'from_id',
-       dest_col = 'to_id',
-       opportunity_col = 'jobs',
-       population_col = 'population',
-       decay_function = decay_binary(cutoff = 50),
-       travel_cost_col = 'travel_time'
-       )
+  travel_matrix,
+  land_use_data,
+  method = "2sfca",
+  decay_function = decay_binary(cutoff = 50),
+  opportunity = "jobs",
+  travel_cost = "travel_time",
+  demand = "population"
+)
 head(df)
+
 
 # BFCA with an exponential decay function
 df <- floating_catchment_area(
-       data = ttm,
-       fca_metric = 'BFCA',
-       orig_col = 'from_id',
-       dest_col = 'to_id',
-       opportunity_col = 'jobs',
-       population_col = 'population',
-       decay_function = decay_exponential(decay_value = 0.5),
-       travel_cost_col = 'travel_time'
-       )
+  travel_matrix,
+  land_use_data,
+  method = "bfca",
+  decay_function = decay_exponential(decay_value = 0.5),
+  opportunity = "jobs",
+  travel_cost = "travel_time",
+  demand = "population"
+)
 head(df)
 
+}
+\references{
+\insertAllCited{}
 }
 \concept{Floating catchment area}

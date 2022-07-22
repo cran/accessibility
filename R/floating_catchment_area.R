@@ -1,157 +1,231 @@
-#' @title Floating catchment area accessibility
+#' Floating catchment area accessibility
 #'
-#' @description
-#' Calculates accessibility accounting for the competition of resources using one
-#' of the multiple accessibility metrics in the floating catchment area family.
-#' The function currently includes `2SFCA` 2-Step Floating Catchment Area (Luo &
-#' Wang, 2003), and `BFCA` Balanced Floating Catchment Area (Paez et al. 2021).
-#' Accessibility can be calculated using multiple alternative decay functions
-#' passed through the `decay_function` parameter.
+#' Calculates accessibility accounting for the competition of resources using a
+#' measure from the floating catchment area (FCA) family. Please see the
+#' details for the available FCA measures.
+#' @template description_generic_cost
 #'
-#' @template input_data
-#' @param fca_metric A `string` indicating which floating catchment area
-#'   accessibility measure to use. Options available: `"2SFCA"` and `"BFCA"`.
-#'   More info in the details.
-#' @template arguments_fca
+#' @template travel_matrix
+#' @template land_use_data
+#' @template opportunity
+#' @template travel_cost
+#' @param demand A string. The name of the column in `land_use_data` with the
+#'   number of people in each origin that will be considered potential
+#'   competitors. Defaults to `"population"`.
+#' @param method A string. Which floating catchment area measure to use.
+#'   Current available options are `"2sfca"` and `"bfca"`. More info in the
+#'   details.
 #' @template decay_function
-#' @template opportunity_col
-#' @template travel_cost_col
+#' @template group_by
+#' @template fill_missing_ids_combinations
 #'
-#' @return A `data.table` object.
+#' @template return_accessibility
+#'
+#' @section Details:
+#' The package currently includes two built-in FCA measures:
+#'
+#' - 2SFCA - the 2-Step Floating Catchment Area measure was the first
+#' accessibility metric in the FCA family. It was originally proposed by
+#' \insertCite{luo2003measures;textual}{accessibility}.
+#'
+#' - BFCA - the Balanced Floating Catchment Area measure calculates
+#' accessibility accounting for competition effects while simultaneously
+#' correcting for issues of inflation of demand and service levels that are
+#' present in other FCA measures. It was originally proposed by
+#' \insertCite{paez2019demand;textual}{accessibility} and named in
+#' \insertCite{pereira2021geographic;textual}{accessibility}.
+#'
+#' @references
+#' \insertAllCited{}
+#'
 #' @family Floating catchment area
+#'
 #' @examples
-#' library(accessibility)
+#' data_dir <- system.file("extdata", package = "accessibility")
+#' travel_matrix <- readRDS(file.path(data_dir, "travel_matrix.rds"))
+#' land_use_data <- readRDS(file.path(data_dir, "land_use_data.rds"))
 #'
-#' # load a travel time matrix data in long format
-#' data_path <- system.file("extdata/ttm_bho.rds", package = "accessibility")
-#' ttm <- readRDS(data_path)
+#' # 2SFCA with a step decay function
+#' df <- floating_catchment_area(
+#'   travel_matrix,
+#'   land_use_data,
+#'   method = "2sfca",
+#'   decay_function = decay_binary(cutoff = 50),
+#'   opportunity = "jobs",
+#'   travel_cost = "travel_time",
+#'   demand = "population"
+#' )
+#' head(df)
 #'
-#'# 2SFCA with a step decay function
-#'df <- floating_catchment_area(
-#'        data = ttm,
-#'        fca_metric = '2SFCA',
-#'        orig_col = 'from_id',
-#'        dest_col = 'to_id',
-#'        opportunity_col = 'jobs',
-#'        population_col = 'population',
-#'        decay_function = decay_binary(cutoff = 50),
-#'        travel_cost_col = 'travel_time'
-#'        )
-#'head(df)
 #'
-#'# BFCA with an exponential decay function
-#'df <- floating_catchment_area(
-#'        data = ttm,
-#'        fca_metric = 'BFCA',
-#'        orig_col = 'from_id',
-#'        dest_col = 'to_id',
-#'        opportunity_col = 'jobs',
-#'        population_col = 'population',
-#'        decay_function = decay_exponential(decay_value = 0.5),
-#'        travel_cost_col = 'travel_time'
-#'        )
-#'head(df)
-#'
-#' @details
-#' # 2SFCA
-#' The 2SFCA measure was the first accessibility metric in the floating
-#' catchment area family. It was originally proposed by Luo & Wang (2003).
-#'
-#' # BFCA
-#' The balanced floating catchment area (BFCA) metric calculates accessibility
-#' accounting for competition effects while simultaneously correcting for issues
-#' of inflation of demand and service levels that are present in previous
-#' floating  catchment area measures. BFCA was  was originally proposed by Paez
-#' et al. (2019) and named in Pereira et al. (2021).
-#'
-#' ## References:
-#' - Luo, W., & Wang, F. (2003). Measures of spatial accessibility to health
-#' care in a GIS environment: synthesis and a case study in the Chicago region.
-#' Environment and planning B: planning and design, 30(6), 865-884. \doi{10.1068/b29120}.
-#'
-#' - Paez, A., Higgins, C. D., & Vivona, S. F. (2019). Demand and level of
-#' service inflation in Floating Catchment Area (FCA) methods. Plos one, 14(6),
-#' e0218773. \doi{10.1371/journal.pone.0218773}
-#'
-#' - Pereira, R. H., Braga, C. K. V., Servo, L. M., Serra, B., Amaral, P.,
-#' Gouveia, N., & Paez, A. (2021). Geographic access to COVID-19 healthcare in
-#' Brazil using a balanced float catchment area approach. Social Science &
-#' Medicine, 273. \doi{10.1016/j.socscimed.2021.113773}
+#' # BFCA with an exponential decay function
+#' df <- floating_catchment_area(
+#'   travel_matrix,
+#'   land_use_data,
+#'   method = "bfca",
+#'   decay_function = decay_exponential(decay_value = 0.5),
+#'   opportunity = "jobs",
+#'   travel_cost = "travel_time",
+#'   demand = "population"
+#' )
+#' head(df)
 #'
 #' @export
-floating_catchment_area <- function(data,
-                                    fca_metric,
-                                    orig_col,
-                                    dest_col,
-                                    population_col,
-                                    opportunity_col,
+floating_catchment_area <- function(travel_matrix,
+                                    land_use_data,
+                                    opportunity,
+                                    travel_cost,
+                                    demand,
+                                    method,
                                     decay_function,
-                                    travel_cost_col = 'travel_time'){
+                                    group_by = character(0),
+                                    fill_missing_ids = TRUE) {
+  checkmate::assert(
+    checkmate::check_string(method),
+    checkmate::check_names(method, subset.of = c("2sfca", "bfca")),
+    combine = "and"
+  )
+  checkmate::assert_string(opportunity)
+  checkmate::assert_string(travel_cost)
+  checkmate::assert_string(demand)
+  checkmate::assert_logical(fill_missing_ids, len = 1, any.missing = FALSE)
+  assert_decay_function(decay_function)
+  assert_group_by(group_by)
+  assert_travel_matrix(travel_matrix, travel_cost, group_by)
+  assert_land_use_data(land_use_data, opportunity, demand)
 
-  # orig_col <- 'from_id'
-  # dest_col <- 'to_id'
-  # opportunity_col <- 'jobs'
-  # population_col <- 'population'
+  # if not a dt, keep original class to assign later when returning result
 
+  if (!inherits(travel_matrix, "data.table")) {
+    original_class <- class(travel_matrix)
+    data <- data.table::as.data.table(travel_matrix)
+  } else {
+    data <- data.table::copy(travel_matrix)
+  }
 
-  # check inputs ------------------------------------------------------------
-  checkmate::assert_data_frame(data)
+  if (!inherits(land_use_data, "data.table")) {
+    land_use_data <- data.table::as.data.table(land_use_data)
+  }
 
-  checkmate::assert_string(orig_col)
-  checkmate::assert_string(dest_col)
-  checkmate::assert_string(opportunity_col)
-  checkmate::assert_string(population_col)
-  checkmate::assert_string(travel_cost_col)
-  checkmate::assert_names(names(data), must.include = orig_col, .var.name = "data")
-  checkmate::assert_names(names(data), must.include = dest_col, .var.name = "data")
-  checkmate::assert_names(names(data), must.include = opportunity_col, .var.name = "data")
-  checkmate::assert_names(names(data), must.include = population_col, .var.name = "data")
-  checkmate::assert_names(names(data), must.include = travel_cost_col, .var.name = "data")
+  merge_by_reference(data, land_use_data, opportunity, active = TRUE)
+  merge_by_reference(data, land_use_data, demand, active = FALSE)
 
-  checkmate::assert_function(decay_function)
+  .cost_colname <- travel_cost
+  data[, opp_weight := decay_function(get(.cost_colname))]
 
-  fca_options <- c('2SFCA', 'BFCA')
-  if (! fca_metric %in% fca_options){stop("Parameter 'fca_metric' must be one of the following: ", paste0(fca_options, collapse = ", "))}
+  groups <- c("from_id", group_by)
+  warn_extra_cols(
+    travel_matrix,
+    travel_cost,
+    group_id = "from_id",
+    groups = groups
+  )
 
+  fca_function <- if (method == "2sfca") {
+    fca_2sfca
+  } else {
+    fca_bfca
+  }
 
-  # # select FCA metric  ---------------------------------------------------------
-  ##> THIS throws error in testthat because tests cannot find the 'fca_fun' function
-  ##>
-  # fca_fun <- if(fca_metric=='2SFCA'){ accessibility::fca_2sfca}
-  # fca_fun <- if(fca_metric=='BFCA'){ accessibility::fca_bfca}
-  #
-  #   access <- fca_fun(data = data,
-  #                      orig_col = orig_col,
-  #                      dest_col = dest_col,
-  #                      population_col = population_col,
-  #                      opportunity_col = opportunity_col,
-  #                      decay_function = decay_function,
-  #                      travel_cost_col = travel_cost_col
-  #                      )
+  access <- fca_function(data, opportunity, demand, group_by)
 
-  # calculate access -----------------------------------------------------------
+  if (fill_missing_ids) {
+    unique_values <- lapply(groups, function(x) unique(travel_matrix[[x]]))
+    names(unique_values) <- groups
+    possible_combinations <- do.call(data.table::CJ, unique_values)
 
-  # 2SFCA
-  if (fca_metric=='2SFCA') {
-    access <- fca_2sfca(data = data,
-                       orig_col = orig_col,
-                       dest_col = dest_col,
-                       population_col = population_col,
-                       opportunity_col = opportunity_col,
-                       decay_function = decay_function,
-                       travel_cost_col = travel_cost_col)
+    if (nrow(access) < nrow(possible_combinations)) {
+      access <- do_fill_missing_ids(access, possible_combinations, groups)
     }
+  }
 
-  # BFCA
-  if (fca_metric=='BFCA') {
-    access <- fca_bfca(data = data,
-                       orig_col = orig_col,
-                       dest_col = dest_col,
-                       population_col = population_col,
-                       opportunity_col = opportunity_col,
-                       decay_function = decay_function,
-                       travel_cost_col = travel_cost_col)
-    }
+  data.table::setnames(access, c("from_id", "access"), c("id", opportunity))
+
+  if (exists("original_class")) class(access) <- original_class
+
+  return(access)
+}
+
+
+#' @keywords internal
+fca_2sfca <- function(data, opportunity, demand, group_by) {
+  .opportunity_colname <- opportunity
+  .demand_colname <- demand
+
+  # step 1a - calculate the demand to each destination as the weight between
+  # each od pair multiplied by the number of people at the origin
+
+  data[
+    ,
+    pop_served := sum(get(.demand_colname) * opp_weight, na.rm = TRUE),
+    by = c("to_id", group_by)
+  ]
+
+  # step 1b - calculate the provider-to-population ratio (ppr) of a destination
+  # as number of opportunities/resources located at it divided by the
+  # population it serves
+
+  data[, ppr := get(.opportunity_colname) / pop_served]
+
+  # step 2 - calculate accessibility at each origin i as the sum of the
+  # multiplication between the ppr of destination j and the weight between od
+  # pair ij
+
+  access <- data[
+    ,
+    .(access = sum(ppr * opp_weight, na.rm = TRUE)),
+    by = c("from_id", group_by)
+  ]
+
+  return(access)
+}
+
+
+#' @keywords internal
+fca_bfca <- function(data, opportunity, demand, group_by) {
+  .opportunity_colname <- opportunity
+  .demand_colname <- demand
+
+  # calculate balanced (normalized) opp_weight by origin and by destination
+
+  data[
+    ,
+    balanced_opp_weight_i := opp_weight / sum(opp_weight),
+    by = c("from_id", group_by)
+  ]
+  data[
+    ,
+    balanced_opp_weight_j := opp_weight / sum(opp_weight),
+    by = c("to_id", group_by)
+  ]
+
+  # step 1a - calculate the balanced demand to each destination as the balanced
+  # weight by origin multiplied by the number of people at the origin
+
+  data[
+    ,
+    balanced_pop_served := sum(
+      get(.demand_colname) * balanced_opp_weight_i,
+      na.rm = TRUE
+    ),
+    by = c("to_id", group_by)
+  ]
+
+  # step 1b - calculate the balanced provider-to-population ratio
+  # (balanced_ppr) of a destination as number of opportunities/resources
+  # located at it divided by the balanced demand
+
+  data[, balanced_ppr := get(.opportunity_colname) / balanced_pop_served]
+
+  # step 2 - calculate accessibility at each origin i as the sum of the
+  # multiplication between the balanced_ppr of destination j and the balanced
+  # weight by destination between od pair ij
+
+  access <- data[
+    ,
+    .(access = sum(balanced_ppr * balanced_opp_weight_j, na.rm = TRUE)),
+    by = c("from_id", group_by)
+  ]
 
   return(access)
 }

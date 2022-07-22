@@ -5,13 +5,25 @@
 \alias{accessibility}
 \alias{_PACKAGE}
 \alias{accessibility-package}
-\title{accessibility: Transport accessibility metrics}
+\title{accessibility: Transport accessibility measures}
 \description{
-Transport accessibility metrics
+A set of fast and convenient functions to calculate multiple transport
+accessibility measures. Given a pre-computed travel cost matrix and a land
+use dataset (containing the location of jobs, healthcare and population, for
+example), the package allows one to calculate active and passive
+accessibility levels using multiple accessibility measures, such as:
+cumulative opportunities (using either travel cost cutoffs or intervals),
+minimum travel cost to closest N number of activities, gravity-based (with
+different decay functions) and different floating catchment area methods.
 }
 \section{Usage}{
 
 Please check the vignettes for more on the package usage:
+\itemize{
+\item Introduction to accessibility: calculating accessibility measures. Run
+\code{vignette("accessibility")} or check it on the \href{https://ipeagit.github.io/accessibility/articles/accessibility.html}{website}.
+\item Decay functions. Run \code{vignette("decay_functions", package = "accessibility")} or check it on the \href{https://ipeagit.github.io/accessibility/articles/decay_functions.html}{website}.
+}
 }
 
 \seealso{
@@ -23,11 +35,11 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Rafael H. M. Pereira \email{rafa.pereira.br@gmail.com} (\href{https://orcid.org/0000-0003-2125-7465}{ORCID})
+\strong{Maintainer}: Daniel Herszenhut \email{dhersz@gmail.com} (\href{https://orcid.org/0000-0001-8066-1105}{ORCID})
 
 Authors:
 \itemize{
-  \item Daniel Herszenhut \email{dhersz@gmail.com} (\href{https://orcid.org/0000-0001-8066-1105}{ORCID})
+  \item Rafael H. M. Pereira \email{rafa.pereira.br@gmail.com} (\href{https://orcid.org/0000-0003-2125-7465}{ORCID})
 }
 
 Other contributors:

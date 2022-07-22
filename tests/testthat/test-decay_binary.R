@@ -1,42 +1,24 @@
-context("Decay binary")
-
-# if running manually, please run the following line first:
-# source("tests/testthat/setup.R")
-
-testthat::skip_on_cran()
-
-
-default_tester <- function(cutoff = 20) {
-
-  results <- accessibility::decay_binary(cutoff = cutoff)
-  return(results)
-}
-
-
-# errors and warnings -----------------------------------------------------
-
+tester <- function(cutoff = 20) decay_binary(cutoff)
 
 test_that("adequately raises errors", {
-
-
-  # incorrect input
-  expect_error( default_tester(cutoff = -1) )
-  expect_error( default_tester(cutoff = 'banana') )
-  expect_error( default_tester(cutoff = NULL) )
-
+  expect_error(tester("banana"))
+  expect_error(tester(c(1, 1)))
+  expect_error(tester(-1))
+  expect_error(tester(Inf))
+  expect_error(tester(NULL))
 })
 
+test_that("output is a decay function that returns an integer", {
+  expect_is(tester(), "function")
 
+  value_test <- tester(20)
+  expect_equal(value_test(10), 1)
+  expect_equal(value_test(20), 1)
+  expect_equal(value_test(60), 0)
+})
 
-# adequate behavior ------------------------------------------------------
-
-
-test_that("output is correct", {
-
-f_test  <- default_tester(cutoff = 30)
-
-  expect_is(f_test(20), 'numeric')
-  expect_equal(f_test(10), 1)
-  expect_equal(f_test(60), 0)
-
+test_that("returns empty integer if receives empty numeric/integer", {
+  value_test <- tester()
+  expect_identical(value_test(integer()), integer())
+  expect_identical(value_test(numeric()), integer())
 })

@@ -4,68 +4,79 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 
-## -----------------------------------------------------------------------------
+## ---- eval = requireNamespace("ggplot2", quietly = TRUE), out.width = "80%", fig.width = 6, fig.height = 6----
 library(accessibility)
 library(data.table)
 library(ggplot2)
 
-# Generate inputs
-vec <- 0:100
-decay_value <- 0.2
-cutoff <- 50
+binary <- decay_binary(cutoff = 50)
+linear <- decay_linear(cutoff = 50)
+negative_exp <- decay_exponential(decay_value = 0.2)
+inverse_power <- decay_power(decay_value = 0.2)
+stepped <- decay_stepped(steps = c(30, 60, 90), weights = c(0.66, 0.33, 0))
 
-# Return functions
-step        <- decay_binary(cutoff=cutoff)
-linear      <- decay_linear(cutoff=cutoff)
-exponential <- decay_exponential(decay_value=decay_value)
-power       <- decay_power(decay_value = decay_value)
+travel_costs <- seq(1, 100, 0.1)
 
-df <- data.table(minutes       = vec,
-                 binary        = step(vec),
-                 linear        = linear(vec),
-                 exponential   = exponential(vec),
-                 inverse_power = power(vec)
-                 )
+weights <- data.table(
+  minutes = travel_costs,
+  binary = as.numeric(binary(travel_costs)),
+  linear = linear(travel_costs),
+  negative_exp = negative_exp(travel_costs),
+  inverse_power = inverse_power(travel_costs),
+  stepped = stepped(travel_costs)
+)
 
-# reshape the data to long format
-df2 <- data.table::melt.data.table(data = df, 
-                                   id.vars = 'minutes', 
-                                   variable.name = 'decay_function', 
-                                   value.name = 'impedance_factor')
+# reshape data to long format
+weights <- melt(
+  weights,
+  id.vars = "minutes",
+  variable.name = "decay_function",
+  value.name = "weights"
+)
 
-# plot
-ggplot() +
-  geom_line(data=df2, aes(x=minutes, y=impedance_factor, color=decay_function), show.legend = FALSE) +
-  facet_wrap(.~decay_function, ncol = 2) +
+ggplot(weights) +
+  geom_line(
+    aes(minutes, weights, color = decay_function),
+    show.legend = FALSE
+  ) +
+  facet_wrap(. ~ decay_function, ncol = 2) +
   theme_minimal()
 
-
-## ---- message=FALSE, warning=FALSE--------------------------------------------
-
-# load input data
-data_path <- system.file("extdata/ttm_bho.rds", package = "accessibility")
-ttm <- readRDS(data_path)
-head(ttm)
-
-
 ## -----------------------------------------------------------------------------
-# create custom decay function
-custom_decay_fun <- function(k) {
-  impedance <- function(t_ij) {
-    f <- 1 / t_ij ^ k
-    return(f)
-  }
+my_decay <- function(travel_cost) {
+  weights <- 1 / travel_cost
+  weights[weights > 1] <- 1
+  return(weights)
 }
 
-## ---- message = FALSE---------------------------------------------------------
-# calculate gravity-based accessibility
-grav_custom <- gravity_access(
-                  data = ttm,
-                  opportunity_col = 'jobs',
-                  decay_function = custom_decay_fun(k=0.5),
-                  travel_cost_col = 'travel_time',
-                  by_col = 'from_id'
-                  )
+## -----------------------------------------------------------------------------
+my_decay(c(0, 0.5, 1, 2, 5, 10))
 
-head(grav_custom)
+## -----------------------------------------------------------------------------
+data_dir <- system.file("extdata", package = "accessibility")
+
+travel_matrix <- readRDS(file.path(data_dir, "travel_matrix.rds"))
+land_use_data <- readRDS(file.path(data_dir, "land_use_data.rds"))
+
+custom_gravity <- gravity(
+  travel_matrix,
+  land_use_data,
+  opportunity = "jobs",
+  travel_cost = "travel_time",
+  decay_function = my_decay
+)
+head(custom_gravity)
+
+## -----------------------------------------------------------------------------
+power_gravity <- gravity(
+  travel_matrix,
+  land_use_data,
+  opportunity = "jobs",
+  travel_cost = "travel_time",
+  decay_function = decay_power(1)
+)
+head(power_gravity)
+
+## -----------------------------------------------------------------------------
+decay_power(1)
 

@@ -7,31 +7,34 @@
 decay_linear(cutoff)
 }
 \arguments{
-\item{cutoff}{A \code{numeric} value. A number indicating the max cutoff point of
-travel cost.}
+\item{cutoff}{A \code{numeric}. A number indicating the travel cost cutoff until
+which the weighting factor decays linearly. From this point onward the
+weight is equal to 0.}
 }
 \value{
-A \code{function} that converts travel time cost t_id into an impedance factor.
+A \code{function} that takes a generic travel cost vector (\code{numeric}) as
+an input and returns a vector of weights (\code{numeric}).
 }
 \description{
-Returns a linear impedance function to be used inside \code{accessibility}
-functions.
+Returns a linear weighting function to be used inside accessibility
+calculating functions.
+
+This function is generic over any kind of numeric travel cost,
+such as distance, time and money.
 }
 \examples{
-library(accessibility)
+weighting_function <- decay_linear(cutoff = 30)
 
-# Create a linear impedance function
-impedance <- decay_linear(cutoff = 30)
+weighting_function(20)
 
-impedance(t_ij = 20)
-impedance(t_ij = 25)
-impedance(t_ij = 35)
+weighting_function(35)
 
 }
 \seealso{
-Other Impedance functions: 
+Other decay functions: 
 \code{\link{decay_binary}()},
 \code{\link{decay_exponential}()},
-\code{\link{decay_power}()}
+\code{\link{decay_power}()},
+\code{\link{decay_stepped}()}
 }
-\concept{Impedance functions}
+\concept{decay functions}

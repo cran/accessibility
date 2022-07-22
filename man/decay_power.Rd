@@ -7,30 +7,33 @@
 decay_power(decay_value)
 }
 \arguments{
-\item{decay_value}{A \code{numeric} value.}
+\item{decay_value}{A \code{numeric}. The calibration parameter to be used as the
+exponent in the inverse power function.}
 }
 \value{
-A \code{function} that converts travel time cost t_id into an impedance factor.
+A \code{function} that takes a generic travel cost vector (\code{numeric}) as
+an input and returns a vector of weights (\code{numeric}).
 }
 \description{
-Returns an inverse power impedance function to be used inside
-\code{accessibility} functions.
+Returns an inverse power weighting function to be used inside accessibility
+calculating functions.
+
+This function is generic over any kind of numeric travel cost,
+such as distance, time and money.
 }
 \examples{
-library(accessibility)
+weighting_function <- decay_power(decay_value = 0.1)
 
-# Create an inverse power impedance function
-impedance <- decay_power(decay_value = 0.1)
+weighting_function(20)
 
-impedance(t_ij = 20)
-impedance(t_ij = 25)
-impedance(t_ij = 35)
+weighting_function(35)
 
 }
 \seealso{
-Other Impedance functions: 
+Other decay functions: 
 \code{\link{decay_binary}()},
 \code{\link{decay_exponential}()},
-\code{\link{decay_linear}()}
+\code{\link{decay_linear}()},
+\code{\link{decay_stepped}()}
 }
-\concept{Impedance functions}
+\concept{decay functions}
