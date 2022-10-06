@@ -64,7 +64,8 @@ cum_interval <- cumulative_interval(
   land_use_data = land_use_data,
   opportunity = "jobs",
   travel_cost = "travel_time",
-  interval = c(40, 60)
+  interval = c(40, 60),
+  summary_function = base::mean
 )
 head(cum_interval)
 

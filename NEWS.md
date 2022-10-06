@@ -1,3 +1,12 @@
+# accessibility 1.0.1
+
+## Bug fixes
+
+- Fixed a bug in which `cost_to_closest()` would return `NA` values when
+  filling missing ids (which should be filled with `Inf`, since they cannot
+  reach any opportunities). This was also responsible for the warning reported
+  in #27, which was also fixed.
+
 # accessibility 1.0.0
 
 The package has been to tremendous changes. Basically, there's not a single
