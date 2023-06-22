@@ -19,21 +19,33 @@ cumulative_cutoff(
 \item{travel_matrix}{A data frame. The travel matrix describing the costs
 (i.e. travel time, distance, monetary cost, etc.) between the origins and
 destinations in the study area. Must contain the columns \code{from_id}, \code{to_id}
-and any others specified in \code{travel_cost_col}.}
+and any others specified in \code{travel_cost}.}
 
 \item{land_use_data}{A data frame. The distribution of opportunities within
 the study area cells. Must contain the columns \code{id} and any others
-specified in \code{opportunity_col}.}
+specified in \code{opportunity}.}
 
 \item{opportunity}{A string. The name of the column in \code{land_use_data}
 with the number of opportunities/resources/services to be considered when
 calculating accessibility levels.}
 
-\item{travel_cost}{A string. The name of the column in \code{travel_matrix}
-with the travel cost between origins and destinations. Defaults to
-\code{"travel_time"}.}
+\item{travel_cost}{A \code{character} vector. The name of the columns in
+\code{travel_matrix} with the travel costs between origins and destinations to
+be considered in the calculation.}
 
-\item{cutoff}{A \code{numeric}. A number indicating the travel cost cutoff.}
+\item{cutoff}{Either a \code{numeric} vector or a list of \code{numeric} vectors, one
+for each cost specified in \code{travel_cost}. The travel cost cutoffs to
+consider when calculating accessibility levels. If a list, the function
+finds every single possible cutoff combination and use them to calculate
+accessibility (e.g. if one specifies that travel time cutoffs should be 30
+and 60 minutes and that monetary cost cutoffs should be 5 and 10 dollars,
+the output includes accessibility estimates limited at 30 min & 5 dollars,
+30 min & 10 dollars, 60 min & 5 dollars and 60 min & 10 dollars). In these
+cases, cost constraints are considered simultaneously - i.e. only trips
+that take 30 minutes or less AND 5 dollars or less to be completed, for
+example, are included in the accessibility output. The cutoff parameter is
+not included in the final output if the input includes only a single cutoff
+for a single travel cost.}
 
 \item{group_by}{A \code{character} vector. When not \code{character(0)} (the default),
 indicates the \code{travel_matrix} columns that should be used to group the
@@ -68,6 +80,7 @@ This function is generic over any kind of numeric travel cost,
 such as distance, time and money.
 }
 \examples{
+\dontshow{if (identical(tolower(Sys.getenv("NOT_CRAN")), "true")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 data_dir <- system.file("extdata", package = "accessibility")
 travel_matrix <- readRDS(file.path(data_dir, "travel_matrix.rds"))
 land_use_data <- readRDS(file.path(data_dir, "land_use_data.rds"))
@@ -77,6 +90,15 @@ df <- cumulative_cutoff(
   travel_matrix = travel_matrix,
   land_use_data = land_use_data,
   cutoff = 30,
+  opportunity = "schools",
+  travel_cost = "travel_time"
+)
+head(df)
+
+df <- cumulative_cutoff(
+  travel_matrix = travel_matrix,
+  land_use_data = land_use_data,
+  cutoff = c(30, 60),
   opportunity = "schools",
   travel_cost = "travel_time"
 )
@@ -93,6 +115,18 @@ df <- cumulative_cutoff(
 )
 head(df)
 
+# using multiple travel costs
+pareto_frontier <- readRDS(file.path(data_dir, "pareto_frontier.rds"))
+
+df <- cumulative_cutoff(
+  pareto_frontier,
+  land_use_data = land_use_data,
+  opportunity = "jobs",
+  travel_cost = c("travel_time", "monetary_cost"),
+  cutoff = list(c(20, 30), c(0, 5, 10))
+)
+head(df)
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 Other cumulative access: 

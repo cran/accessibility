@@ -22,7 +22,7 @@
 #' @name accessibility
 #' @aliases accessibility-package
 #'
-#' @importFrom data.table := .I .SD %chin% .GRP .N
+#' @importFrom data.table := .I .SD %chin% .GRP .N fifelse
 #' @importFrom utils globalVariables
 #' @importFrom Rdpack reprompt
 #'
@@ -49,7 +49,30 @@ utils::globalVariables(
     "balanced_opp_weight_j",
     "balanced_pop_served",
     "balanced_ppr",
-    "..opportunity"
+    "..opportunity",
+    "demand_bal_fac",
+    "impedance_bal_fac",
+    "combined_bal_fac",
+    "decay_function_arg",
+    "cost",
+    "did_balance",
+    "avg_access",
+    "i.avg_access",
+    ".palma_group",
+    "poorest_avg_access",
+    "p",
+    "FGT0",
+    "FGT1",
+    "FGT2",
+    ".area_under_curve",
+    ".big_edge",
+    ".cum_total_access",
+    ".prop_pop",
+    ".small_edge",
+    ".fgt0",
+    ".fgt1",
+    ".fgt2",
+    ".norm_opp_shortfall"
   )
 )
 

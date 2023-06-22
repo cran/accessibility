@@ -91,6 +91,27 @@ bfca <- floating_catchment_area(
 )
 head(bfca)
 
+## -----------------------------------------------------------------------------
+spatial_avlblt <- spatial_availability(
+  travel_matrix,
+  land_use_data,
+  opportunity = "jobs",
+  travel_cost = "travel_time",
+  demand = "population",
+  decay_function = decay_exponential(decay_value = 0.1)
+)
+head(spatial_avlblt)
+
+## -----------------------------------------------------------------------------
+bal_cost <- balancing_cost(
+  travel_matrix,
+  land_use_data,
+  opportunity = "jobs",
+  travel_cost = "travel_time",
+  demand = "population"
+)
+head(bal_cost)
+
 ## ---- eval = requireNamespace(c("sf", "ggplot2"), quietly = TRUE), out.width = "80%", fig.width = 6, fig.height = 6----
 grid <- system.file("extdata/grid_bho.rds", package = "accessibility")
 grid <- readRDS(grid)

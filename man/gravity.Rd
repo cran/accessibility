@@ -19,19 +19,18 @@ gravity(
 \item{travel_matrix}{A data frame. The travel matrix describing the costs
 (i.e. travel time, distance, monetary cost, etc.) between the origins and
 destinations in the study area. Must contain the columns \code{from_id}, \code{to_id}
-and any others specified in \code{travel_cost_col}.}
+and any others specified in \code{travel_cost}.}
 
 \item{land_use_data}{A data frame. The distribution of opportunities within
 the study area cells. Must contain the columns \code{id} and any others
-specified in \code{opportunity_col}.}
+specified in \code{opportunity}.}
 
 \item{opportunity}{A string. The name of the column in \code{land_use_data}
 with the number of opportunities/resources/services to be considered when
 calculating accessibility levels.}
 
 \item{travel_cost}{A string. The name of the column in \code{travel_matrix}
-with the travel cost between origins and destinations. Defaults to
-\code{"travel_time"}.}
+with the travel cost between origins and destinations.}
 
 \item{decay_function}{A \code{fuction} that converts travel cost into an
 impedance factor used to weight opportunities. This function should take a
@@ -75,6 +74,7 @@ This function is generic over any kind of numeric travel cost,
 such as distance, time and money.
 }
 \examples{
+\dontshow{if (identical(tolower(Sys.getenv("NOT_CRAN")), "true")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 data_dir <- system.file("extdata", package = "accessibility")
 travel_matrix <- readRDS(file.path(data_dir, "travel_matrix.rds"))
 land_use_data <- readRDS(file.path(data_dir, "land_use_data.rds"))
@@ -96,5 +96,5 @@ df_exp <- gravity(
   travel_cost = "travel_time"
 )
 head(df_exp)
-
+\dontshow{\}) # examplesIf}
 }

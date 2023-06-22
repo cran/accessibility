@@ -7,12 +7,13 @@
 decay_power(decay_value)
 }
 \arguments{
-\item{decay_value}{A \code{numeric}. The calibration parameter to be used as the
-exponent in the inverse power function.}
+\item{decay_value}{A \code{numeric} vector. The calibration parameters to be used
+as the exponents in the inverse power function.}
 }
 \value{
 A \code{function} that takes a generic travel cost vector (\code{numeric}) as
-an input and returns a vector of weights (\code{numeric}).
+an input and returns a \code{list} of weight vectors (a list of \code{numeric}
+vectors, named after the arguments passed to the decay function).
 }
 \description{
 Returns an inverse power weighting function to be used inside accessibility
@@ -22,12 +23,15 @@ This function is generic over any kind of numeric travel cost,
 such as distance, time and money.
 }
 \examples{
+\dontshow{if (identical(tolower(Sys.getenv("NOT_CRAN")), "true")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 weighting_function <- decay_power(decay_value = 0.1)
 
-weighting_function(20)
+weighting_function(c(20, 35))
 
-weighting_function(35)
+weighting_function <- decay_power(decay_value = c(0.1, 0.2))
 
+weighting_function(c(20, 35))
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 Other decay functions: 

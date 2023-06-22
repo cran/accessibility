@@ -20,23 +20,22 @@ floating_catchment_area(
 \item{travel_matrix}{A data frame. The travel matrix describing the costs
 (i.e. travel time, distance, monetary cost, etc.) between the origins and
 destinations in the study area. Must contain the columns \code{from_id}, \code{to_id}
-and any others specified in \code{travel_cost_col}.}
+and any others specified in \code{travel_cost}.}
 
 \item{land_use_data}{A data frame. The distribution of opportunities within
 the study area cells. Must contain the columns \code{id} and any others
-specified in \code{opportunity_col}.}
+specified in \code{opportunity}.}
 
 \item{opportunity}{A string. The name of the column in \code{land_use_data}
 with the number of opportunities/resources/services to be considered when
 calculating accessibility levels.}
 
 \item{travel_cost}{A string. The name of the column in \code{travel_matrix}
-with the travel cost between origins and destinations. Defaults to
-\code{"travel_time"}.}
+with the travel cost between origins and destinations.}
 
 \item{demand}{A string. The name of the column in \code{land_use_data} with the
 number of people in each origin that will be considered potential
-competitors. Defaults to \code{"population"}.}
+competitors.}
 
 \item{method}{A string. Which floating catchment area measure to use.
 Current available options are \code{"2sfca"} and \code{"bfca"}. More info in the
@@ -97,6 +96,7 @@ present in other FCA measures. It was originally proposed by
 }
 
 \examples{
+\dontshow{if (identical(tolower(Sys.getenv("NOT_CRAN")), "true")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 data_dir <- system.file("extdata", package = "accessibility")
 travel_matrix <- readRDS(file.path(data_dir, "travel_matrix.rds"))
 land_use_data <- readRDS(file.path(data_dir, "land_use_data.rds"))
@@ -125,7 +125,7 @@ df <- floating_catchment_area(
   demand = "population"
 )
 head(df)
-
+\dontshow{\}) # examplesIf}
 }
 \references{
 \insertAllCited{}
