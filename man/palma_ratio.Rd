@@ -31,18 +31,19 @@ levels.}
 with the number of people in each cell. Used to weigh accessibility levels
 when calculating inequality.}
 
-\item{income}{A string. The name of column in \code{sociodemographic_data} with
-the income variable that should be used to classify the population in
+\item{income}{A string. The name of the column in \code{sociodemographic_data}
+with the income variable that should be used to classify the population in
 socioeconomic groups. Please note that this variable should describe income
-per capita (e.g. mean income per capita, household income per
-capita, etc), instead of the total amount of income in each cell.}
+per capita (e.g. mean income per capita, household income per capita, etc),
+instead of the total amount of income in each cell.}
 
 \item{group_by}{A \code{character} vector. When not \code{character(0)} (the default),
 indicates the \code{accessibility_data} columns that should be used to group the
 inequality estimates by. For example, if \code{accessibility_data} includes a
-\code{departure_time} column that specifies the departure time that each entry
-refers to, passing \code{"departure_time"} to this parameter results in
-inequality estimates grouped by departure time.}
+\code{scenario} column that identifies distinct scenarios that each
+accessibility estimates refer to (e.g. before and after a transport policy
+intervention), passing \code{"scenario"} to this parameter results in inequality
+estimates grouped by scenario.}
 }
 \value{
 A data frame containing the inequality estimates for the study area.
@@ -80,6 +81,8 @@ palma
 }
 \seealso{
 Other inequality: 
-\code{\link{gini_index}()}
+\code{\link{concentration_index}()},
+\code{\link{gini_index}()},
+\code{\link{theil_t}()}
 }
 \concept{inequality}

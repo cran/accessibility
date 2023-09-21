@@ -1,17 +1,19 @@
-## ---- include = FALSE---------------------------------------------------------
+## ----include = FALSE----------------------------------------------------------
+Sys.setenv(OMP_THREAD_LIMIT = 2)
+
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
 
-## ---- eval = FALSE------------------------------------------------------------
+## ----eval = FALSE-------------------------------------------------------------
 #  install.packages("accessibility")
 
-## ---- eval = FALSE------------------------------------------------------------
+## ----eval = FALSE-------------------------------------------------------------
 #  # install.packages("remotes")
 #  remotes::install_github("ipeaGIT/accessibility")
 
-## ---- message = FALSE, warning = FALSE----------------------------------------
+## ----message = FALSE, warning = FALSE-----------------------------------------
 library(accessibility)
 library(data.table)
 library(ggplot2)
@@ -27,7 +29,7 @@ head(travel_matrix)
 land_use_data <- readRDS(file.path(data_dir, "land_use_data.rds"))
 head(land_use_data)
 
-## ---- message = FALSE---------------------------------------------------------
+## ----message = FALSE----------------------------------------------------------
 mtc <- cost_to_closest(
   travel_matrix,
   land_use_data,
@@ -37,7 +39,7 @@ mtc <- cost_to_closest(
 )
 head(mtc)
 
-## ---- message = FALSE---------------------------------------------------------
+## ----message = FALSE----------------------------------------------------------
 cum_cutoff <- cumulative_cutoff(
   travel_matrix,
   land_use_data,
@@ -47,7 +49,7 @@ cum_cutoff <- cumulative_cutoff(
 )
 head(cum_cutoff)
 
-## ---- message = FALSE---------------------------------------------------------
+## ----message = FALSE----------------------------------------------------------
 passive_cum_cutoff <- cumulative_cutoff(
   travel_matrix,
   land_use_data,
@@ -58,7 +60,7 @@ passive_cum_cutoff <- cumulative_cutoff(
 )
 head(passive_cum_cutoff)
 
-## ---- message = FALSE---------------------------------------------------------
+## ----message = FALSE----------------------------------------------------------
 cum_interval <- cumulative_interval(
   travel_matrix = travel_matrix,
   land_use_data = land_use_data,
@@ -69,7 +71,7 @@ cum_interval <- cumulative_interval(
 )
 head(cum_interval)
 
-## ---- message = FALSE---------------------------------------------------------
+## ----message = FALSE----------------------------------------------------------
 negative_exp <- gravity(
   travel_matrix,
   land_use_data,
@@ -79,7 +81,7 @@ negative_exp <- gravity(
 )
 head(negative_exp)
 
-## ---- message = FALSE---------------------------------------------------------
+## ----message = FALSE----------------------------------------------------------
 bfca <- floating_catchment_area(
   travel_matrix,
   land_use_data,
@@ -112,7 +114,7 @@ bal_cost <- balancing_cost(
 )
 head(bal_cost)
 
-## ---- eval = requireNamespace(c("sf", "ggplot2"), quietly = TRUE), out.width = "80%", fig.width = 6, fig.height = 6----
+## ----eval = requireNamespace(c("sf", "ggplot2"), quietly = TRUE), out.width = "80%", fig.width = 6, fig.height = 6----
 grid <- system.file("extdata/grid_bho.rds", package = "accessibility")
 grid <- readRDS(grid)
 

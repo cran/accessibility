@@ -360,7 +360,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </ul>
 <div id="palma-ratio" class="section level2">
 <h2>Palma Ratio</h2>
-<p><code>palma_ratio()</code> calculates the Palma Ratio of a given accessibility distribution. Originally defined as the income share of the wealthiest 10% of a population divided by the income share of the poorest 40%, this measure has been adapted in transport planning as the average accessibility of the wealthiest 10% divided by the average accessibility of the poorest 40%.</p>
+<p><code>palma_ratio()</code> calculates the Palma Ratio of a given accessibility distribution. Originally defined as the income share of the wealthiest 10% of a population divided by the income share of the poorest 40%, this measure has been adapted in transport planning as the average accessibility of the wealthiest 10% divided by the average accessibility of the poorest 40%. Palma Ratio values higher than 1 indicate a scenario in which the wealthiest population has higher accessibility levels than the poorest, whereas values lower than 1 indicate the opposite situation.</p>
 <p>This function includes an additional <code>income</code> parameter, used to list the column in the sociodemographic dataset with the income variable that should be used to classify the population in socioeconomic groups. Please note that this variable should describe income per capita (e.g. mean income per capita, household income per capita, etc), instead of the total amount of income in each cell.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">palma &lt;-<span class="st"> </span><span class="kw">palma_ratio</span>(</a>
 <a class="sourceLine" id="cb2-2" title="2">  access,</a>
@@ -375,7 +375,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </div>
 <div id="gini-index" class="section level2">
 <h2>Gini Index</h2>
-<p><code>gini_index()</code> calculates the Gini Index of a given accessibility distribution.</p>
+<p><code>gini_index()</code> calculates the Gini Index of a given accessibility distribution. Probably the most frequently used inequality measure in transport planning, this index estimates how much a distribution deviates from a hypothetical situation in which everyone has the exact same accessibility conditions. Gini Index values range from 0 to 1. A value of 0 indicates a scenario of perfect equality, in which everyone has the same accessibility levels, whereas a value of 1 indicates a scenario of perfect inequality, in which the accessibility levels in a study area are all concentrated into a single cell.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1">gini &lt;-<span class="st"> </span><span class="kw">gini_index</span>(</a>
 <a class="sourceLine" id="cb3-2" title="2">  access,</a>
 <a class="sourceLine" id="cb3-3" title="3">  <span class="dt">sociodemographic_data =</span> land_use_data,</a>
@@ -386,6 +386,89 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <a class="sourceLine" id="cb3-8" title="8"><span class="co">#&gt;    gini_index</span></a>
 <a class="sourceLine" id="cb3-9" title="9"><span class="co">#&gt; 1:  0.4715251</span></a></code></pre></div>
 </div>
+<div id="concentration-index" class="section level2">
+<h2>Concentration Index</h2>
+<p><code>concentration_index()</code> calculates the Concentration Index (CI) of a given accessibility distribution. This measures estimates the extent to which accessibility inequalities are systematically associated with individuals’ socioeconomic levels. CI values can theoretically vary between -1 and 1 (when all accessibility is concentrated in the most or in the least disadvantaged cell, respectively). Negative values indicate that inequalities favor the poor, while positive values indicate a pro-rich bias.</p>
+<p>Just like <code>palma_ratio()</code>, this function includes an <code>income</code> parameter to indicate which variable from the sociodemographic dataset should be used to rank the population from the least to the most privileged groups. Unlike the Palma Ratio function, however, any variable that can be used to describe one’s socioeconomic status, such as education level, for example, can be passed to this argument, as long as it can be numerically ordered (in which higher values denote higher socioeconomic status).</p>
+<p><code>concentration_index()</code> also includes a <code>type</code> parameter, used to indicate which Concentration Index to calculate. This parameter currently supports two values, <code>&quot;standard&quot;</code> and <code>&quot;corrected&quot;</code>, which respectively identify the standard relative CI and the corrected CI, proposed by <span class="citation">Erreygers (2009)</span>.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1">ci &lt;-<span class="st"> </span><span class="kw">concentration_index</span>(</a>
+<a class="sourceLine" id="cb4-2" title="2">  access,</a>
+<a class="sourceLine" id="cb4-3" title="3">  <span class="dt">sociodemographic_data =</span> land_use_data,</a>
+<a class="sourceLine" id="cb4-4" title="4">  <span class="dt">opportunity =</span> <span class="st">&quot;jobs&quot;</span>,</a>
+<a class="sourceLine" id="cb4-5" title="5">  <span class="dt">population =</span> <span class="st">&quot;population&quot;</span>,</a>
+<a class="sourceLine" id="cb4-6" title="6">  <span class="dt">income =</span> <span class="st">&quot;income_per_capita&quot;</span>,</a>
+<a class="sourceLine" id="cb4-7" title="7">  <span class="dt">type =</span> <span class="st">&quot;corrected&quot;</span></a>
+<a class="sourceLine" id="cb4-8" title="8">)</a>
+<a class="sourceLine" id="cb4-9" title="9">ci</a>
+<a class="sourceLine" id="cb4-10" title="10"><span class="co">#&gt;    concentration_index</span></a>
+<a class="sourceLine" id="cb4-11" title="11"><span class="co">#&gt; 1:           0.3346494</span></a></code></pre></div>
+</div>
+<div id="theil-t" class="section level2">
+<h2>Theil T</h2>
+<p><code>theil_t()</code> calculates the Theil T Index of a given accessibility distribution. Values range from 0 (when all individuals have exactly the same accessibility levels) to the natural log of <em>n</em>, in which <em>n</em> is the number of individuals in the accessibility dataset.</p>
+<p>If the individuals can be classified into mutually exclusive and completely exhaustive groups (i.e. into groups that do not overlap and cover the entire population), the index can be decomposed into a between- and a within-groups inequality component. The function includes a <code>socioeconomic_groups</code> parameter to indicate which variable from the sociodemographic dataset should be used identify the socioeconomic groups used to calculate these components.</p>
+<p>Please note that the output <code>theil_t()</code> varies based on the value of <code>socioeconomic_groups</code>. If <code>NULL</code> (the default), the between- and within-groups components are not calculated, and the function returns a data frame containing only the total aggregate inequality for the returned area. If <code>socioeconomic_groups</code> is not <code>NULL</code>, however, the function returns a list containing three dataframes: one summarizing the total inequality and the between- and within-groups components, one listing the contribution of each group to the between-groups component and another listing the contribution of each group to the within-groups component. Both behaviors are shown below.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">theil_without_groups &lt;-<span class="st"> </span><span class="kw">theil_t</span>(</a>
+<a class="sourceLine" id="cb5-2" title="2">  access,</a>
+<a class="sourceLine" id="cb5-3" title="3">  <span class="dt">sociodemographic_data =</span> land_use_data,</a>
+<a class="sourceLine" id="cb5-4" title="4">  <span class="dt">opportunity =</span> <span class="st">&quot;jobs&quot;</span>,</a>
+<a class="sourceLine" id="cb5-5" title="5">  <span class="dt">population =</span> <span class="st">&quot;population&quot;</span></a>
+<a class="sourceLine" id="cb5-6" title="6">)</a>
+<a class="sourceLine" id="cb5-7" title="7">theil_without_groups</a>
+<a class="sourceLine" id="cb5-8" title="8"><span class="co">#&gt;      theil_t</span></a>
+<a class="sourceLine" id="cb5-9" title="9"><span class="co">#&gt; 1: 0.3616631</span></a>
+<a class="sourceLine" id="cb5-10" title="10"></a>
+<a class="sourceLine" id="cb5-11" title="11"><span class="co"># some cells are classified as in the decile NA because their income per capita</span></a>
+<a class="sourceLine" id="cb5-12" title="12"><span class="co"># is NaN, as they don&#39;t have any population. we filter these cells from our</span></a>
+<a class="sourceLine" id="cb5-13" title="13"><span class="co"># accessibility data, otherwise the output would include NA values (note that</span></a>
+<a class="sourceLine" id="cb5-14" title="14"><span class="co"># subsetting the data like this doesn&#39;t affect the assumption that groups are</span></a>
+<a class="sourceLine" id="cb5-15" title="15"><span class="co"># completely exhaustive, because cells with NA income decile don&#39;t have any</span></a>
+<a class="sourceLine" id="cb5-16" title="16"><span class="co"># population)</span></a>
+<a class="sourceLine" id="cb5-17" title="17"></a>
+<a class="sourceLine" id="cb5-18" title="18">na_decile_ids &lt;-<span class="st"> </span>land_use_data[<span class="kw">is.na</span>(land_use_data<span class="op">$</span>income_decile), ]<span class="op">$</span>id</a>
+<a class="sourceLine" id="cb5-19" title="19">no_na_access &lt;-<span class="st"> </span>access[<span class="op">!</span><span class="st"> </span>access<span class="op">$</span>id <span class="op">%in%</span><span class="st"> </span>na_decile_ids, ]</a>
+<a class="sourceLine" id="cb5-20" title="20">sociodem_data &lt;-<span class="st"> </span>land_use_data[<span class="op">!</span><span class="st"> </span>land_use_data<span class="op">$</span>id <span class="op">%in%</span><span class="st"> </span>na_decile_ids, ]</a>
+<a class="sourceLine" id="cb5-21" title="21"></a>
+<a class="sourceLine" id="cb5-22" title="22">theil_with_groups &lt;-<span class="st"> </span><span class="kw">theil_t</span>(</a>
+<a class="sourceLine" id="cb5-23" title="23">  no_na_access,</a>
+<a class="sourceLine" id="cb5-24" title="24">  <span class="dt">sociodemographic_data =</span> sociodem_data,</a>
+<a class="sourceLine" id="cb5-25" title="25">  <span class="dt">opportunity =</span> <span class="st">&quot;jobs&quot;</span>,</a>
+<a class="sourceLine" id="cb5-26" title="26">  <span class="dt">population =</span> <span class="st">&quot;population&quot;</span>,</a>
+<a class="sourceLine" id="cb5-27" title="27">  <span class="dt">socioeconomic_groups =</span> <span class="st">&quot;income_decile&quot;</span></a>
+<a class="sourceLine" id="cb5-28" title="28">)</a>
+<a class="sourceLine" id="cb5-29" title="29">theil_with_groups</a>
+<a class="sourceLine" id="cb5-30" title="30"><span class="co">#&gt; $summary</span></a>
+<a class="sourceLine" id="cb5-31" title="31"><span class="co">#&gt;        component     value share_of_total</span></a>
+<a class="sourceLine" id="cb5-32" title="32"><span class="co">#&gt; 1: between_group 0.1280753      0.3541287</span></a>
+<a class="sourceLine" id="cb5-33" title="33"><span class="co">#&gt; 2:  within_group 0.2335878      0.6458713</span></a>
+<a class="sourceLine" id="cb5-34" title="34"><span class="co">#&gt; 3:         total 0.3616631      1.0000000</span></a>
+<a class="sourceLine" id="cb5-35" title="35"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb5-36" title="36"><span class="co">#&gt; $within_group_component</span></a>
+<a class="sourceLine" id="cb5-37" title="37"><span class="co">#&gt;     income_decile       value share_of_component</span></a>
+<a class="sourceLine" id="cb5-38" title="38"><span class="co">#&gt;  1:             1 0.009181454         0.03930622</span></a>
+<a class="sourceLine" id="cb5-39" title="39"><span class="co">#&gt;  2:             2 0.011413697         0.04886255</span></a>
+<a class="sourceLine" id="cb5-40" title="40"><span class="co">#&gt;  3:             3 0.019320622         0.08271246</span></a>
+<a class="sourceLine" id="cb5-41" title="41"><span class="co">#&gt;  4:             4 0.023606928         0.10106232</span></a>
+<a class="sourceLine" id="cb5-42" title="42"><span class="co">#&gt;  5:             5 0.031470429         0.13472633</span></a>
+<a class="sourceLine" id="cb5-43" title="43"><span class="co">#&gt;  6:             6 0.023539337         0.10077296</span></a>
+<a class="sourceLine" id="cb5-44" title="44"><span class="co">#&gt;  7:             7 0.033329635         0.14268567</span></a>
+<a class="sourceLine" id="cb5-45" title="45"><span class="co">#&gt;  8:             8 0.032585905         0.13950173</span></a>
+<a class="sourceLine" id="cb5-46" title="46"><span class="co">#&gt;  9:             9 0.020299031         0.08690107</span></a>
+<a class="sourceLine" id="cb5-47" title="47"><span class="co">#&gt; 10:            10 0.028840780         0.12346868</span></a>
+<a class="sourceLine" id="cb5-48" title="48"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb5-49" title="49"><span class="co">#&gt; $between_group_component</span></a>
+<a class="sourceLine" id="cb5-50" title="50"><span class="co">#&gt;     income_decile        value</span></a>
+<a class="sourceLine" id="cb5-51" title="51"><span class="co">#&gt;  1:             1 -0.037573783</span></a>
+<a class="sourceLine" id="cb5-52" title="52"><span class="co">#&gt;  2:             2 -0.036276865</span></a>
+<a class="sourceLine" id="cb5-53" title="53"><span class="co">#&gt;  3:             3 -0.031829123</span></a>
+<a class="sourceLine" id="cb5-54" title="54"><span class="co">#&gt;  4:             4 -0.021600054</span></a>
+<a class="sourceLine" id="cb5-55" title="55"><span class="co">#&gt;  5:             5 -0.009938574</span></a>
+<a class="sourceLine" id="cb5-56" title="56"><span class="co">#&gt;  6:             6 -0.004401762</span></a>
+<a class="sourceLine" id="cb5-57" title="57"><span class="co">#&gt;  7:             7  0.025936879</span></a>
+<a class="sourceLine" id="cb5-58" title="58"><span class="co">#&gt;  8:             8  0.042240708</span></a>
+<a class="sourceLine" id="cb5-59" title="59"><span class="co">#&gt;  9:             9  0.075742415</span></a>
+<a class="sourceLine" id="cb5-60" title="60"><span class="co">#&gt; 10:            10  0.125775443</span></a></code></pre></div>
+</div>
 <div id="foster-greer-thorbecke-fgt-poverty-measures" class="section level2">
 <h2>Foster-Greer-Thorbecke (FGT) poverty measures</h2>
 <p><code>fgt_poverty()</code> calculates the FGT metrics, a family of poverty measures originally proposed by <span class="citation">Foster, Greer, and Thorbecke (1984)</span> that capture the extent and severity of poverty within an accessibility distribution. The FGT family is composed of three measures that differ based on the <span class="math inline">\(\alpha\)</span> parameter used to calculate them (either 0, 1 or 2) and which also changes their interpretation:</p>
@@ -395,21 +478,24 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <li>with <span class="math inline">\(\alpha = 2\)</span> (FGT2) the measure simultaneously captures the extent and the severity of poverty by calculating the number of people below the poverty line weighted by the size of the accessibility shortfall relative to the poverty line.</li>
 </ul>
 <p>This function includes an additional <code>poverty_line</code> parameter, used to define the poverty line below which individuals are considered to be in accessibility poverty.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1">poverty &lt;-<span class="st"> </span><span class="kw">fgt_poverty</span>(</a>
-<a class="sourceLine" id="cb4-2" title="2">  access,</a>
-<a class="sourceLine" id="cb4-3" title="3">  <span class="dt">opportunity =</span> <span class="st">&quot;jobs&quot;</span>,</a>
-<a class="sourceLine" id="cb4-4" title="4">  <span class="dt">sociodemographic_data =</span> land_use_data,</a>
-<a class="sourceLine" id="cb4-5" title="5">  <span class="dt">population =</span> <span class="st">&quot;population&quot;</span>,</a>
-<a class="sourceLine" id="cb4-6" title="6">  <span class="dt">poverty_line =</span> <span class="dv">95368</span></a>
-<a class="sourceLine" id="cb4-7" title="7">)</a>
-<a class="sourceLine" id="cb4-8" title="8">poverty</a>
-<a class="sourceLine" id="cb4-9" title="9"><span class="co">#&gt;         FGT0      FGT1      FGT2</span></a>
-<a class="sourceLine" id="cb4-10" title="10"><span class="co">#&gt; 1: 0.5745378 0.3277383 0.2218769</span></a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">poverty &lt;-<span class="st"> </span><span class="kw">fgt_poverty</span>(</a>
+<a class="sourceLine" id="cb6-2" title="2">  access,</a>
+<a class="sourceLine" id="cb6-3" title="3">  <span class="dt">sociodemographic_data =</span> land_use_data,</a>
+<a class="sourceLine" id="cb6-4" title="4">  <span class="dt">opportunity =</span> <span class="st">&quot;jobs&quot;</span>,</a>
+<a class="sourceLine" id="cb6-5" title="5">  <span class="dt">population =</span> <span class="st">&quot;population&quot;</span>,</a>
+<a class="sourceLine" id="cb6-6" title="6">  <span class="dt">poverty_line =</span> <span class="dv">95368</span></a>
+<a class="sourceLine" id="cb6-7" title="7">)</a>
+<a class="sourceLine" id="cb6-8" title="8">poverty</a>
+<a class="sourceLine" id="cb6-9" title="9"><span class="co">#&gt;         FGT0      FGT1      FGT2</span></a>
+<a class="sourceLine" id="cb6-10" title="10"><span class="co">#&gt; 1: 0.5745378 0.3277383 0.2218769</span></a></code></pre></div>
 </div>
 </div>
 <div id="references" class="section level1 unnumbered">
 <h1>References</h1>
 <div id="refs" class="references">
+<div id="ref-erreygers2009correcting">
+<p>Erreygers, Guido. 2009. “Correcting the Concentration Index.” <em>Journal of Health Economics</em> 28 (2): 504–15. <a href="https://doi.org/10.1016/j.jhealeco.2008.02.003">https://doi.org/10.1016/j.jhealeco.2008.02.003</a>.</p>
+</div>
 <div id="ref-foster1984class">
 <p>Foster, James, Joel Greer, and Erik Thorbecke. 1984. “A Class of Decomposable Poverty Measures.” <em>Econometrica</em> 52 (3): 761–66. <a href="https://doi.org/10.2307/1913475">https://doi.org/10.2307/1913475</a>.</p>
 </div>

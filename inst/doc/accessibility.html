@@ -381,13 +381,13 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <p>The land use data must also be structured in a <code>data.frame</code> and must contain an <code>id</code> column, referring to the ids listed in the travel matrix, and the number of opportunities/facilities/services in each spatial unit. The sample dataset we’ll be using looks like this:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">land_use_data &lt;-<span class="st"> </span><span class="kw">readRDS</span>(<span class="kw">file.path</span>(data_dir, <span class="st">&quot;land_use_data.rds&quot;</span>))</a>
 <a class="sourceLine" id="cb5-2" title="2"><span class="kw">head</span>(land_use_data)</a>
-<a class="sourceLine" id="cb5-3" title="3"><span class="co">#&gt;                 id population jobs schools income_per_capita</span></a>
-<a class="sourceLine" id="cb5-4" title="4"><span class="co">#&gt; 1: 89a881a5a2bffff        381  180       0           22369.1</span></a>
-<a class="sourceLine" id="cb5-5" title="5"><span class="co">#&gt; 2: 89a881a5a2fffff        269  134       0            3205.1</span></a>
-<a class="sourceLine" id="cb5-6" title="6"><span class="co">#&gt; 3: 89a881a5a67ffff        929  143       0           11394.0</span></a>
-<a class="sourceLine" id="cb5-7" title="7"><span class="co">#&gt; 4: 89a881a5a6bffff        249   61       0            3659.8</span></a>
-<a class="sourceLine" id="cb5-8" title="8"><span class="co">#&gt; 5: 89a881a5a6fffff        176   11       0            4905.1</span></a>
-<a class="sourceLine" id="cb5-9" title="9"><span class="co">#&gt; 6: 89a881a5b03ffff        681 1071       0            2200.2</span></a></code></pre></div>
+<a class="sourceLine" id="cb5-3" title="3"><span class="co">#&gt;                 id population jobs schools income_per_capita income_decile</span></a>
+<a class="sourceLine" id="cb5-4" title="4"><span class="co">#&gt; 1: 89a881a5a2bffff        381  180       0           22369.1            10</span></a>
+<a class="sourceLine" id="cb5-5" title="5"><span class="co">#&gt; 2: 89a881a5a2fffff        269  134       0            3205.1             9</span></a>
+<a class="sourceLine" id="cb5-6" title="6"><span class="co">#&gt; 3: 89a881a5a67ffff        929  143       0           11394.0            10</span></a>
+<a class="sourceLine" id="cb5-7" title="7"><span class="co">#&gt; 4: 89a881a5a6bffff        249   61       0            3659.8             9</span></a>
+<a class="sourceLine" id="cb5-8" title="8"><span class="co">#&gt; 5: 89a881a5a6fffff        176   11       0            4905.1            10</span></a>
+<a class="sourceLine" id="cb5-9" title="9"><span class="co">#&gt; 6: 89a881a5b03ffff        681 1071       0            2200.2             8</span></a></code></pre></div>
 </div>
 <div id="minimum-travel-cost" class="section level2">
 <h2>Minimum travel cost</h2>

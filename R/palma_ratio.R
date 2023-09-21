@@ -7,17 +7,14 @@
 #' average accessibility of the poorest 40%.
 #'
 #' @template accessibility_data
-#' @param sociodemographic_data A data frame. The distribution of
-#'   sociodemographic characteristics of the population in the study area cells.
-#'   Must contain the columns `id` and any others specified in `population` and
-#'   `income`.
+#' @template sociodem_data_with_income
 #' @template opportunity_access
 #' @template population
-#' @param income A string. The name of column in `sociodemographic_data` with
-#'   the income variable that should be used to classify the population in
+#' @param income A string. The name of the column in `sociodemographic_data`
+#'   with the income variable that should be used to classify the population in
 #'   socioeconomic groups. Please note that this variable should describe income
-#'   per capita (e.g. mean income per capita, household income per
-#'   capita, etc), instead of the total amount of income in each cell.
+#'   per capita (e.g. mean income per capita, household income per capita, etc),
+#'   instead of the total amount of income in each cell.
 #' @template group_by_access
 #'
 #' @template return_inequality
@@ -58,7 +55,12 @@ palma_ratio <- function(accessibility_data,
   checkmate::assert_string(income)
   assert_access_group_by(group_by)
   assert_accessibility_data(accessibility_data, opportunity, group_by)
-  assert_sociodemographic_data(sociodemographic_data, c(population, income))
+  assert_sociodemographic_data(
+    sociodemographic_data,
+    accessibility_data,
+    population = population,
+    income = income
+  )
 
   if (!inherits(accessibility_data, "data.table")) {
     original_class <- class(accessibility_data)

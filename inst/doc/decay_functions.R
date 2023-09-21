@@ -1,4 +1,6 @@
-## ---- include = FALSE---------------------------------------------------------
+## ----include = FALSE----------------------------------------------------------
+Sys.setenv(OMP_THREAD_LIMIT = 2)
+
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -19,7 +21,7 @@ stepped_output <- decay_stepped(
 
 stepped_output(c(15, 25, 35, 45))
 
-## ---- eval = requireNamespace("ggplot2", quietly = TRUE), out.width = "80%", fig.width = 6, fig.height = 6----
+## ----eval = requireNamespace("ggplot2", quietly = TRUE), out.width = "80%", fig.width = 6, fig.height = 6----
 library(data.table)
 library(ggplot2)
 

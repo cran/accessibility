@@ -1,6 +1,6 @@
-#' Gini index
+#' Gini Index
 #'
-#' Calculates the Gini index of a given accessibility distribution.
+#' Calculates the Gini Index of a given accessibility distribution.
 #'
 #' @template accessibility_data
 #' @template sociodem_data_without_income
@@ -43,7 +43,11 @@ gini_index <- function(accessibility_data,
   checkmate::assert_string(population)
   assert_access_group_by(group_by)
   assert_accessibility_data(accessibility_data, opportunity, group_by)
-  assert_sociodemographic_data(sociodemographic_data, population)
+  assert_sociodemographic_data(
+    sociodemographic_data,
+    accessibility_data,
+    population = population
+  )
 
   if (!inherits(accessibility_data, "data.table")) {
     original_class <- class(accessibility_data)
