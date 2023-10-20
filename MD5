@@ -1,11 +1,11 @@
-6effbc766898716b96f010eadee4de28 *DESCRIPTION
+64f258e51cfebbe145e4f4aa18e6453d *DESCRIPTION
 825e89612882471122a75f171f6c7294 *LICENSE
 2b4bb4f3e3f9dfa95bb8ebd2d9e49c84 *NAMESPACE
-ca904fd0073ec4890ca7fd54dee3593c *NEWS.md
+76cb763726bf1d9dfbf2d0a41dd17491 *NEWS.md
 8a8c2a3ff3a4357569f1aff521da290d *R/accessibility.R
 ace72c4a39ca502fc6de91cebfad7c31 *R/apply_gravity_measure.R
-207b4924ee3f328a9376dd1f2814ce19 *R/assert_and_assign.R
-4277da20a0652f13236453c054f58f13 *R/balancing_cost.R
+1ce14096778da9020729f2593b477291 *R/assert_and_assign.R
+208f5c8e6848ed00b29cdd64794c6031 *R/balancing_cost.R
 d79fa3e47c6debf54da0c98a2f7b647e *R/concentration_index.R
 e549f2896a84fd2832d8903b222ed438 *R/cost_to_closest.R
 dcfcff60ac3a62f637c032f76c180419 *R/cumulative_cutoff.R
@@ -22,11 +22,11 @@ e2c12e2076c3aaf37a807eff4a997a6d *R/gini_index.R
 bf38ed2c885d71b414c0e1ab6046b530 *R/gravity.R
 510c7e7914cef432d4b9be0a0418a11a *R/merge_by_reference.R
 9d9588c779f21da090a5ed7de76c68b8 *R/palma_ratio.R
-c30358a6ba500f31fb6eca61bd7c8a54 *R/spatial_availability.R
+cca754573ad9142ad367e0edaffa78c9 *R/spatial_availability.R
 365c7944fec85c2d90219533fc58a5d5 *R/theil_t.R
 442f5ff87dbd9e9ba21c6e4220af9278 *R/warn_extra_cols.R
 15cfc9fe1d9f8167504f6322d540d8a6 *README.md
-6c973ea9ec2308ee76a8d3fe978f50e1 *build/partial.rdb
+14448aabe4a5c16af356dbbbeb088eda *build/partial.rdb
 09667a3b8934d83b9ea1a13f9a355e3d *build/vignette.rds
 d3cab67a1a5f146e56f0837e6fe8d93f *inst/REFERENCES.bib
 57774378e6e229c87384b6f15cc745d5 *inst/doc/accessibility.R
@@ -34,7 +34,7 @@ d3cab67a1a5f146e56f0837e6fe8d93f *inst/REFERENCES.bib
 566248919253c6a87612289b7a3f8a88 *inst/doc/accessibility.html
 55d647a6dbe5280e05434d60ecc61699 *inst/doc/decay_functions.R
 5a80ae43ed8430e34478ba16b5d76e7e *inst/doc/decay_functions.Rmd
-6f6b38ca769219963731084a55f2112c *inst/doc/decay_functions.html
+481b74566c1ee61ad30c26a76ca50828 *inst/doc/decay_functions.html
 0b9e92f535e8f19bb46ad71b3c13c516 *inst/doc/inequality_and_poverty.R
 641c88c49fda0e4b86fe2a10ea8aa65c *inst/doc/inequality_and_poverty.Rmd
 e88fdf9cea6d943f9dc79363c1475bf1 *inst/doc/inequality_and_poverty.html
@@ -82,7 +82,7 @@ f62bfb833080c637faae007df5365e78 *man/roxygen/templates/return_accessibility.R
 8eeb207f208409396ccc52a29faff555 *man/roxygen/templates/sociodem_data_without_income.R
 0c5551a4af6153735b0f9a7bd5cee219 *man/roxygen/templates/travel_cost.R
 24c72235de70c0bc66a9966e6331fab3 *man/roxygen/templates/travel_matrix.R
-38a5de83e7a523a5134c479873de8a77 *man/spatial_availability.Rd
+8e4f8faf800df91a9eb1bffd94545517 *man/spatial_availability.Rd
 8a4305659dc04a14f605e60533b671f1 *man/theil_t.Rd
 cd05b84c4c4d63e465d0c5e212067760 *tests/test_rafa/comparing_decay_functions.R
 504b86ccf53fed9ea1f801413d74f3d6 *tests/test_rafa/concentr_index.R
@@ -112,7 +112,7 @@ f595d11ae375efb7f5aabdab6570aee8 *tests/testthat/test-decay_stepped.R
 1050002940e9192c8e0847e8069aa6ae *tests/testthat/test-gini_index.R
 fcc3aaeb91c679eb2222c995f58afe68 *tests/testthat/test-gravity.R
 2d7c81fb9d8c54224c63d1e2da752afa *tests/testthat/test-palma_ratio.R
-6f648e1fd28da419d0b155c47213769f *tests/testthat/test-spatial_availability.R
+fb8d425e6f1d61c8e0cc0c5a42dbb9cb *tests/testthat/test-spatial_availability.R
 a10033f2b628606fdc54245145a47026 *tests/testthat/test-theil_t.R
 64d5da24589a528cbac39c21ba19e1c5 *vignettes/accessibility.Rmd
 5a80ae43ed8430e34478ba16b5d76e7e *vignettes/decay_functions.Rmd

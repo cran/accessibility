@@ -547,8 +547,8 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <a class="sourceLine" id="cb9-9" title="9"><span class="co">#&gt;     names(weights_list) &lt;- decay_value</span></a>
 <a class="sourceLine" id="cb9-10" title="10"><span class="co">#&gt;     return(weights_list)</span></a>
 <a class="sourceLine" id="cb9-11" title="11"><span class="co">#&gt; }</span></a>
-<a class="sourceLine" id="cb9-12" title="12"><span class="co">#&gt; &lt;bytecode: 0x558338936068&gt;</span></a>
-<a class="sourceLine" id="cb9-13" title="13"><span class="co">#&gt; &lt;environment: 0x558347566b00&gt;</span></a></code></pre></div>
+<a class="sourceLine" id="cb9-12" title="12"><span class="co">#&gt; &lt;bytecode: 0x558913d24580&gt;</span></a>
+<a class="sourceLine" id="cb9-13" title="13"><span class="co">#&gt; &lt;environment: 0x5589228a3aa8&gt;</span></a></code></pre></div>
 <p>What if we want our custom function to take many decay parameters as inputs, just like the built-in decay functions? In this case, our output function has to return a <code>list</code> of <code>numeric</code> weights named after the decay parameters we have set:</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1">my_third_decay &lt;-<span class="st"> </span><span class="cf">function</span>(decay_parameter) {</a>
 <a class="sourceLine" id="cb10-2" title="2">  <span class="cf">function</span>(travel_cost) {</a>
