@@ -1,3 +1,19 @@
+# accessibility 1.4.0
+
+## Bug fixes
+
+- Fixed a bug in which land use data passed to accessibility functions as a
+  `tibble` could lead to an error.
+
+## New features
+
+- New function `decay_logistic()`.
+
+## Notes
+
+- Package description has been adjusted to better reflect the current set of
+  available features.
+
 # accessibility 1.3.0
 
 ## New features
