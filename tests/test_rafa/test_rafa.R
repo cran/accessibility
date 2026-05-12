@@ -115,6 +115,8 @@ a <- covr::function_coverage(fun=accessibility::decay_binary, test_file("tests/t
 a <- covr::function_coverage(fun=accessibility::decay_power, test_file("tests/testthat/test-decay_power.R"))
 a <- covr::function_coverage(fun=accessibility::decay_exponential, test_file("tests/testthat/test-decay_exponential.R"))
 a <- covr::function_coverage(fun=accessibility::decay_linear, test_file("tests/testthat/test-decay_linear.R"))
+a <- covr::function_coverage(fun=accessibility::constrained_accessibility, test_file("tests/testthat/test-constrained-wrapper.R"))
+a <- covr::function_coverage(fun=accessibility::constrained_accessibility, test_file("tests/testthat/test-constrained-essentials.R"))
 a
 
 zeroCov <- covr::zero_coverage(a)

@@ -10,6 +10,7 @@ fgt_poverty(
   opportunity,
   population,
   poverty_line,
+  poor_below_threshold = TRUE,
   group_by = character(0)
 )
 }
@@ -32,6 +33,14 @@ when calculating poverty.}
 
 \item{poverty_line}{A \code{numeric}. The poverty line below which individuals are
 considered to be in accessibility poverty.}
+
+\item{poor_below_threshold}{Logic. If \code{TRUE} (default,) the observations below
+the poverty line are considered to be poor. This is the correct approach
+for primal accessibility measures (e.g.cumulative accessibility). If
+\code{FALSE}, then observations above the poverty line are considered to be
+poor. This is the correct approach for dual accessibility measures (e.g.
+travel time to the closest facility). When set to \code{FALSE}, FGT 1 and 2
+do not have an upper bound.}
 
 \item{group_by}{A \code{character} vector. When not \code{character(0)} (the default),
 indicates the \code{accessibility_data} columns that should be used to group the
@@ -76,7 +85,7 @@ however, FGT0 value is 1 and FGT1 and FGT2 values approach 1.
 }
 
 \examples{
-\dontshow{if (identical(tolower(Sys.getenv("NOT_CRAN")), "true")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (identical(tolower(Sys.getenv("NOT_CRAN")), "true")) withAutoprint(\{ # examplesIf}
 data_dir <- system.file("extdata", package = "accessibility")
 travel_matrix <- readRDS(file.path(data_dir, "travel_matrix.rds"))
 land_use_data <- readRDS(file.path(data_dir, "land_use_data.rds"))
@@ -90,11 +99,11 @@ access <- cumulative_cutoff(
 )
 
 poverty <- fgt_poverty(
-  access,
+  accessibility_data = access,
   opportunity = "jobs",
   sociodemographic_data = land_use_data,
   population = "population",
-  poverty_line = 95368
+  poverty_line = 50000
 )
 poverty
 \dontshow{\}) # examplesIf}

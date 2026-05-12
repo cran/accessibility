@@ -7,11 +7,11 @@ knitr::opts_chunk$set(
 )
 
 ## ----eval = FALSE-------------------------------------------------------------
-#  install.packages("accessibility")
+# install.packages("accessibility")
 
 ## ----eval = FALSE-------------------------------------------------------------
-#  # install.packages("remotes")
-#  remotes::install_github("ipeaGIT/accessibility")
+# # install.packages("remotes")
+# remotes::install_github("ipeaGIT/accessibility")
 
 ## ----message = FALSE, warning = FALSE-----------------------------------------
 library(accessibility)

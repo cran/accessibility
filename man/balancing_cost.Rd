@@ -29,12 +29,14 @@ specified in \code{opportunity}.}
 with the number of opportunities/resources/services to be considered when
 calculating accessibility levels.}
 
-\item{travel_cost}{A string. The name of the column in \code{travel_matrix}
-with the travel cost between origins and destinations.}
+\item{travel_cost}{A string. The name of the column in \code{travel_matrix} with
+the travel cost between origins and destinations. The notion of cost
+here is generic over any kind of numeric travel cost, such as distance,
+time and money.}
 
 \item{demand}{A string. The name of the column in \code{land_use_data} with the
-number of people in each origin that will be considered potential
-competitors.}
+number of opportunity-demanders at each origin (e.g., people) that will be
+considered.}
 
 \item{cost_increment}{A number. The cost increment that should be used when
 defining the travel cost distribution from which the potential balancing
@@ -85,7 +87,7 @@ This function is generic over any kind of numeric travel cost,
 such as distance, time and money.
 }
 \examples{
-\dontshow{if (identical(tolower(Sys.getenv("NOT_CRAN")), "true")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (identical(tolower(Sys.getenv("NOT_CRAN")), "true")) withAutoprint(\{ # examplesIf}
 data_dir <- system.file("extdata", package = "accessibility")
 travel_matrix <- readRDS(file.path(data_dir, "travel_matrix.rds"))
 land_use_data <- readRDS(file.path(data_dir, "land_use_data.rds"))

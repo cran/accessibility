@@ -54,9 +54,11 @@ departure time column, that specifies the departure time of each entry in
 the data frame, passing \code{"departure_time"} to this parameter results in
 accessibility estimates grouped by origin and by departure time.}
 
-\item{active}{A logical. Whether to calculate active accessibility (the
-of opportunities that can be reached from a given origin, the default) or
-passive accessibility (by how many people each destination can be reached).}
+\item{active}{A logical. When \code{TRUE}, the function calculates active
+accessibility (the quantity of opportunities that can be reached from
+a given origin). when \code{FALSE}, it calculates passive accessibility (by
+how many people each destination can be reached), which is equivalent
+to the notion of market potential.}
 
 \item{fill_missing_ids}{A \code{logical}. Calculating cumulative accessibility may
 result in missing ids if the they cannot reach any of the destinations
@@ -80,7 +82,7 @@ This function is generic over any kind of numeric travel cost,
 such as distance, time and money.
 }
 \examples{
-\dontshow{if (identical(tolower(Sys.getenv("NOT_CRAN")), "true")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (identical(tolower(Sys.getenv("NOT_CRAN")), "true")) withAutoprint(\{ # examplesIf}
 data_dir <- system.file("extdata", package = "accessibility")
 travel_matrix <- readRDS(file.path(data_dir, "travel_matrix.rds"))
 land_use_data <- readRDS(file.path(data_dir, "land_use_data.rds"))

@@ -87,7 +87,8 @@ poverty <- fgt_poverty(
   sociodemographic_data = land_use_data,
   opportunity = "jobs",
   population = "population",
-  poverty_line = 95368
+  poverty_line = 50000
 )
+
 poverty
 
