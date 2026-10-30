@@ -297,3 +297,66 @@ test_that("handles missing data correctly", {
   suppressWarnings(result <- tester(no_access, group_by = character()))
   expect_identical(result, data.table::data.table(palma_ratio = numeric()))
 })
+
+test_that("result doesn't depend on the scale of the population weights", {
+  access_data <- cumulative_cutoff(
+    travel_matrix,
+    land_use_data,
+    opportunity = "jobs",
+    travel_cost = "travel_time",
+    cutoff = 30,
+    group_by = "mode"
+  )
+  population_shares <- data.table::copy(land_use_data)
+  population_shares[, population := population / sum(population)]
+
+  expected <- tester(access_data)
+  result <- tester(access_data, population_shares)
+  expect_false(anyNA(result$palma_ratio))
+  expect_equal(result, expected)
+})
+
+test_that("only returns the group_by combinations present in the data", {
+  transit_matrix <- travel_matrix[mode == "transit"]
+  transit_matrix[, mode := NULL]
+
+  car_am <- cumulative_cutoff(
+    transit_matrix,
+    land_use_data,
+    opportunity = "jobs",
+    travel_cost = "travel_time",
+    cutoff = 30
+  )
+  car_am[, `:=`(mode = "car", period = "am")]
+
+  bus_pm <- data.table::copy(car_am)
+  bus_pm[, `:=`(mode = "bus", period = "pm")]
+
+  result <- tester(rbind(car_am, bus_pm), group_by = c("mode", "period"))
+  expect_identical(nrow(result), 2L)
+  expect_setequal(paste(result$mode, result$period), c("car am", "bus pm"))
+  expect_null(data.table::key(result))
+})
+
+test_that("large integer populations don't overflow", {
+  # with equal populations, the 40% and 90% income quantiles are 4.6 and 9.1,
+  # so ids 1 to 4 are the poorest and id 10 is the wealthiest. the palma ratio
+  # is 10 / mean(1:4) = 4
+
+  accessibility_data <- data.table::data.table(
+    id = as.character(1:10),
+    jobs = as.numeric(1:10)
+  )
+  sociodemographic_data <- data.table::data.table(
+    id = as.character(1:10),
+    population = rep(1000000000L, 10),
+    income_per_capita = as.numeric(1:10)
+  )
+
+  result <- tester(
+    accessibility_data,
+    sociodemographic_data,
+    group_by = character(0)
+  )
+  expect_equal(result$palma_ratio, 4)
+})

@@ -11,13 +11,11 @@ knitr::opts_chunk$set(
 
 ## ----eval = FALSE-------------------------------------------------------------
 # # install.packages("remotes")
-# remotes::install_github("ipeaGIT/accessibility")
+# remotes::install_github("ipea/accessibility")
 
 ## ----message = FALSE, warning = FALSE-----------------------------------------
 library(accessibility)
 library(data.table)
-library(ggplot2)
-library(sf)
 
 ## -----------------------------------------------------------------------------
 data_dir <- system.file("extdata", package = "accessibility")
@@ -114,7 +112,23 @@ bal_cost <- balancing_cost(
 )
 head(bal_cost)
 
-## ----eval = requireNamespace(c("sf", "ggplot2"), quietly = TRUE), out.width = "80%", fig.width = 6, fig.height = 6----
+## -----------------------------------------------------------------------------
+constrained <- constrained_accessibility(
+  travel_matrix,
+  land_use_data,
+  travel_cost = "travel_time",
+  demand = "population",
+  supply = "jobs",
+  constraint = "singly",
+  decay_function = decay_exponential(decay_value = 0.1),
+  active = TRUE
+)
+head(constrained)
+
+## ----eval = requireNamespace("sf", quietly = TRUE) && requireNamespace("ggplot2", quietly = TRUE), message = FALSE, out.width = "80%", fig.width = 6, fig.height = 6----
+library(ggplot2)
+library(sf)
+
 grid <- system.file("extdata/grid_bho.rds", package = "accessibility")
 grid <- readRDS(grid)
 

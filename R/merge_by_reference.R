@@ -2,18 +2,39 @@
 merge_by_reference <- function(data,
                                land_use_data,
                                opportunity,
-                               left_df_idcol) {
+                               left_df_idcol,
+                               na_as_zero = FALSE) {
   # when calculating active accessibility, we want the number of opportunities
   # in the destination. if passive, the number of opportunities in the origin
 
-  right_df_idcol <- "id"
+  # matching the ids and assigning with set() is much faster than an update
+  # join, which sorts the (large) travel matrix on every call. ids missing from
+  # land_use_data get NA, as in a join. land_use_data ids are unique (checked
+  # in the assert_*() helpers)
 
-  join_vector <- right_df_idcol
-  names(join_vector) <- left_df_idcol
+  left_ids <- data[[left_df_idcol]]
+  right_ids <- land_use_data$id
 
-  data[
-    land_use_data,
-    on = join_vector,
-    eval(opportunity) := get(paste0("i.", ..opportunity))
-  ]
+  match_index <- if (is.character(left_ids) && is.character(right_ids)) {
+    data.table::chmatch(left_ids, right_ids)
+  } else {
+    match(left_ids, right_ids)
+  }
+
+  # integer counts (opportunities, demand, supply, population) are converted to
+  # doubles, so that sums and products in the measures don't overflow. they are
+  # converted before matching, because land_use_data is usually much shorter
+  # than the travel matrix
+
+  values <- land_use_data[[opportunity]]
+  if (is.integer(values)) values <- as.numeric(values)
+  values <- values[match_index]
+
+  # in accessibility measures, NA values and ids missing from land_use_data
+  # count as 0 opportunities (or 0 demand/supply). the inequality and poverty
+  # functions keep the NAs
+
+  if (na_as_zero && anyNA(values)) values[is.na(values)] <- 0
+
+  data.table::set(data, j = opportunity, value = values)
 }

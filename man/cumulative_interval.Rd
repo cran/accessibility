@@ -13,7 +13,8 @@ cumulative_interval(
   interval_increment = 1,
   summary_function = stats::median,
   group_by = character(0),
-  active = TRUE
+  active = TRUE,
+  fill_missing_ids = TRUE
 )
 }
 \arguments{
@@ -24,7 +25,8 @@ and any others specified in \code{travel_cost}.}
 
 \item{land_use_data}{A data frame. The distribution of opportunities within
 the study area cells. Must contain the columns \code{id} and any others
-specified in \code{opportunity}.}
+specified in \code{opportunity}. \code{NA} values, and ids in \code{travel_matrix} that
+are missing from this table, are treated as 0.}
 
 \item{opportunity}{A string. The name of the column in \code{land_use_data}
 with the number of opportunities/resources/services to be considered when
@@ -48,7 +50,7 @@ within the interval. Defaults to 1.}
 \item{summary_function}{A function. This function is used to summarize a
 distribution of accessibility estimates within a travel cost interval as a
 single value. Can be any function that takes an arbitrary number of
-numeric values as as input and returns a single number as output. Defaults
+numeric values as input and returns a single number as output. Defaults
 to \code{\link[stats:median]{stats::median()}}.}
 
 \item{group_by}{A \code{character} vector. When not \code{character(0)} (the default),
@@ -56,13 +58,22 @@ indicates the \code{travel_matrix} columns that should be used to group the
 accessibility estimates by. For example, if \code{travel_matrix} includes a
 departure time column, that specifies the departure time of each entry in
 the data frame, passing \code{"departure_time"} to this parameter results in
-accessibility estimates grouped by origin and by departure time.}
+accessibility estimates grouped by origin and by departure time.
+
+Accessibility is calculated separately for each unique combination of
+grouping variables. For constrained accessibility measures, each group is
+treated as an independent land-use-transportation system.}
 
 \item{active}{A logical. When \code{TRUE}, the function calculates active
 accessibility (the quantity of opportunities that can be reached from
-a given origin). when \code{FALSE}, it calculates passive accessibility (by
+a given origin). When \code{FALSE}, it calculates passive accessibility (by
 how many people each destination can be reached), which is equivalent
 to the notion of market potential.}
+
+\item{fill_missing_ids}{A \code{logical}. Origins (or destinations, when \code{active}
+is \code{FALSE}) that cannot reach any opportunity within the interval would
+not be included in the output. When \code{TRUE} (the default), the function
+includes them with an accessibility of 0.}
 }
 \value{
 A data frame containing the accessibility estimates for each
@@ -73,7 +84,7 @@ travel matrix.
 Calculates the average or median number of opportunities that can be reached
 considering multiple maximum travel cost thresholds within a given travel
 cost interval specified by the user. The time interval cumulative
-accessibility measures was originally proposed by
+accessibility measure was originally proposed by
 \insertCite{tomasiello2023time;textual}{accessibility}.
 
 This function is generic over any kind of numeric travel cost,
@@ -108,7 +119,7 @@ head(df)
 \insertAllCited{}
 }
 \seealso{
-Other cumulative access: 
-\code{\link{cumulative_cutoff}()}
+Other cumulative access:
+\code{\link[=cumulative_cutoff]{cumulative_cutoff()}}
 }
 \concept{cumulative access}

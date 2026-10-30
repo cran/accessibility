@@ -23,7 +23,8 @@ and any others specified in \code{travel_cost}.}
 
 \item{land_use_data}{A data frame. The distribution of opportunities within
 the study area cells. Must contain the columns \code{id} and any others
-specified in \code{opportunity}.}
+specified in \code{opportunity}. \code{NA} values, and ids in \code{travel_matrix} that
+are missing from this table, are treated as 0.}
 
 \item{opportunity}{A string. The name of the column in \code{land_use_data}
 with the number of opportunities/resources/services to be considered when
@@ -44,11 +45,15 @@ indicates the \code{travel_matrix} columns that should be used to group the
 accessibility estimates by. For example, if \code{travel_matrix} includes a
 departure time column, that specifies the departure time of each entry in
 the data frame, passing \code{"departure_time"} to this parameter results in
-accessibility estimates grouped by origin and by departure time.}
+accessibility estimates grouped by origin and by departure time.
+
+Accessibility is calculated separately for each unique combination of
+grouping variables. For constrained accessibility measures, each group is
+treated as an independent land-use-transportation system.}
 
 \item{active}{A logical. When \code{TRUE}, the function calculates active
 accessibility (the quantity of opportunities that can be reached from
-a given origin). when \code{FALSE}, it calculates passive accessibility (by
+a given origin). When \code{FALSE}, it calculates passive accessibility (by
 how many people each destination can be reached), which is equivalent
 to the notion of market potential.}
 
@@ -57,10 +62,10 @@ closest N number of opportunities may result in missing ids in the output
 if they cannot reach the specified amount of opportunities across all
 destinations they can reach. For example, estimating the minimum travel
 time that an origin that can only reach 4 opportunities takes to reach 5
-opportunities resulting in such origin not being included in the output.
+opportunities results in such origin not being included in the output.
 When \code{TRUE} (the default), the function identifies which ids would be left
-out from the output and fill their respective minimum travel costs with
-\code{Inf}, which incurs in a performance penalty.}
+out from the output and fills their respective minimum travel costs with
+\code{Inf}, which incurs a performance penalty.}
 }
 \value{
 A data frame containing the accessibility estimates for each
@@ -98,3 +103,9 @@ df <- cost_to_closest(
 head(df)
 \dontshow{\}) # examplesIf}
 }
+\seealso{
+Other accessibility measures:
+\code{\link[=balancing_cost]{balancing_cost()}},
+\code{\link[=gravity]{gravity()}}
+}
+\concept{accessibility measures}

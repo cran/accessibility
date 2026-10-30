@@ -92,3 +92,25 @@ poverty <- fgt_poverty(
 
 poverty
 
+## -----------------------------------------------------------------------------
+time_to_school <- cost_to_closest(
+  travel_matrix,
+  land_use_data,
+  opportunity = "schools",
+  travel_cost = "travel_time"
+)
+
+unreachable <- is.infinite(time_to_school$travel_time)
+time_to_school$travel_time[unreachable] <- 120
+
+poverty_dual <- fgt_poverty(
+  time_to_school,
+  sociodemographic_data = land_use_data,
+  opportunity = "travel_time",
+  population = "population",
+  poverty_line = 20,
+  poor_below_threshold = FALSE
+)
+
+poverty_dual
+

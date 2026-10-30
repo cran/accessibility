@@ -29,7 +29,8 @@ and any others specified in \code{travel_cost}.}
 
 \item{land_use_data}{A data frame. The distribution of opportunities within
 the study area cells. Must contain the columns \code{id} and any others
-specified in \code{opportunity}.}
+specified in \code{opportunity}. \code{NA} values, and ids in \code{travel_matrix} that
+are missing from this table, are treated as 0.}
 
 \item{travel_cost}{A string. The name of the column in \code{travel_matrix} with
 the travel cost between origins and destinations. The notion of cost
@@ -47,13 +48,14 @@ that will be considered.}
 \item{constraint}{A string. One of \code{"total"}, \code{"singly"}, or \code{"doubly"}. See
 Details section for more information.}
 
-\item{decay_function}{A \code{fuction} that converts travel cost into an
+\item{decay_function}{A \code{function} that converts travel cost into an
 impedance factor used to weight opportunities. This function should take a
 \code{numeric} vector and also return a \code{numeric} vector as output, with the
 same length as the input. For convenience, the package currently includes
 the following functions: \code{\link[=decay_binary]{decay_binary()}}, \code{\link[=decay_exponential]{decay_exponential()}},
-\code{\link[=decay_power]{decay_power()}} and \code{\link[=decay_stepped]{decay_stepped()}}. See the documentation of each decay
-function for more details.}
+\code{\link[=decay_linear]{decay_linear()}}, \code{\link[=decay_logistic]{decay_logistic()}}, \code{\link[=decay_power]{decay_power()}} and
+\code{\link[=decay_stepped]{decay_stepped()}}. See the documentation of each decay function for more
+details.}
 
 \item{active}{A logical. When \code{TRUE}, the function calculates active
 accessibility (the quantity of opportunities that can be reached from
@@ -78,19 +80,54 @@ indicates the \code{travel_matrix} columns that should be used to group the
 accessibility estimates by. For example, if \code{travel_matrix} includes a
 departure time column, that specifies the departure time of each entry in
 the data frame, passing \code{"departure_time"} to this parameter results in
-accessibility estimates grouped by origin and by departure time.}
+accessibility estimates grouped by origin and by departure time.
+
+Accessibility is calculated separately for each unique combination of
+grouping variables. For constrained accessibility measures, each group is
+treated as an independent land-use-transportation system.}
 
 \item{fill_missing_ids}{A \code{logical}. When calculating grouped accessibility
-estimates (i.e. when \code{by_col} is not \code{NULL}), some combinations of groups
+estimates (i.e. when \code{group_by} is not empty), some combinations of groups
 and origins may be missing. For example, if a single trip can depart from
 origin \code{A} at 7:15am and reach destination \code{B} within 55 minutes, but no
 trips departing from \code{A} at 7:30am can be completed at all, this second
 combination will not be included in the output. When \code{TRUE} (the default),
 the function identifies which combinations would be left out and fills
-their respective accessibility values with 0, which incurs in a
+their respective accessibility values with 0, which incurs a
 performance penalty.}
 
-\item{detailed_results}{Logical. Whether to return detailed OD-level results.}
+\item{detailed_results}{Logical. Whether to return detailed OD-level
+results for \code{constraint = "total"}- and \code{constraint = "singly"}
+accessibility. Currently ignored for \code{constraint = "doubly"} accessibility,
+which always returns OD-level flows.}
+}
+\value{
+A data frame of the same class as \code{travel_matrix} (\code{data.table},
+\code{data.frame} or \code{tibble}). Its columns depend on \code{constraint}, \code{active}
+and \code{detailed_results}:
+\itemize{
+\item \code{constraint = "total"} or \code{"singly"}, \code{detailed_results = FALSE}: one
+row per origin (\code{from_id}, when \code{active = TRUE}) or destination (\code{to_id},
+when \code{active = FALSE}), plus the \code{group_by} columns. Accessibility is in a
+column named \code{supply} (active) or \code{demand} (passive).
+\item \code{constraint = "total"}, \code{detailed_results = TRUE}: one row per
+origin-destination pair, with the columns \code{from_id}, \code{to_id}, the weighted
+opportunities (\code{weighted_supply} or \code{weighted_demand}), the share of the
+regional total allocated to the pair (\code{kappa_total} or \code{hatkappa_total}),
+the allocated flow (\code{supply} or \code{demand}) and the scaling constant
+(\code{K_total} or \code{hatK_total}).
+\item \code{constraint = "singly"}, \code{detailed_results = TRUE}: one row per
+origin-destination pair, with the columns \code{from_id}, \code{to_id}, the
+allocation share (\code{kappa_singly} or \code{hatkappa_singly}), the allocated flow
+(\code{supply} or \code{demand}) and the balancing factor (\code{B_j} or \code{A_i}).
+\item \code{constraint = "doubly"}: one row per origin-destination pair, with the
+columns \code{from_id}, \code{to_id}, \code{flow}, the balancing factors \code{A_i} and \code{B_j},
+\code{kappa_doubly} and the final balancing \code{error}. \code{detailed_results} and
+\code{active} are not read.
+}
+
+Detailed results include the \code{group_by} columns and, when the decay
+function has several values, \code{decay_function_arg}.
 }
 \description{
 Calculates accessibility using constraints, as proposed in
@@ -102,18 +139,33 @@ constraint cases. Please see the Details section for more information.
 
 This function covers the family of constrained accessibility measures
 proposed in \insertCite{soukhov2025family;textual}{accessibility}.
+
+For these measures, each group or decay value is
+treated as an independent land-use-transportation system. This is not a multimodal
+model that splits demand or supply across groups. Instead, each group is
+calculated as if the function were run separately on that group's rows of
+\code{travel_matrix}. The total allocated within a group is the sum of the
+opportunities (or population) associated with the ids that appear in that
+group's rows.
+
+As well, when \code{fill_missing_ids = TRUE}, ids that are absent from a particular
+group's rows are still returned with accessibility equal to 0. This doesn't
+apply to \code{constraint = "doubly"}, which ignores \code{fill_missing_ids} and
+returns every origin-destination pair of the ids in each group.
 \subsection{Total Constrained Accessibility}{
 
 Allocates the system-wide total proportionally based on travel impedance
 between origins and destinations. This measure uses the logic of a
-total ~(or 'unconstrained' by Wilson's terms)~ constraint.
+total (or 'unconstrained' by Wilson's terms) constraint.
 
 Use this measure when the total quantity of \strong{supply} OR \strong{demand} in the
 system is known and representing accessibility as a proportion of this total
 is meaningful.
 \subsection{Requirement:}{
 \itemize{
-\item Either \code{demand} or \code{supply} must be provided (cannot provide both).
+\item \code{supply} must be provided when \code{active = TRUE}, and \code{demand} when
+\code{active = FALSE}. The other argument is ignored, so the same call can be
+used with \code{constraint = "singly"}, which requires both.
 }
 }
 
@@ -238,10 +290,13 @@ travel  impedance.
 \itemize{
 \item Both \code{demand} and \code{supply} must be provided.
 \item Unlike \code{total} and \code{singly}, \code{doubly} requires the sum of demand and supply
-to match; otherwise, the model will not converge.
-\item \code{active} must be \code{NULL}. Since supply must match demand, their units are
+to match; otherwise, an error is raised. When \code{group_by} or multiple decay
+values are used, the totals must match within each independently balanced
+system.
+\item \code{active} is ignored. Since supply must match demand, their units are
 the same and there is no distinction between 'active' and 'passive' notions.
-\item Only accepts\code{detailed_results = TRUE}.
+\item \code{detailed_results} is currently ignored for doubly-constrained
+accessibility. OD-level flows are always returned.
 }
 }
 
@@ -266,6 +321,7 @@ demand and supply?"
 }
 
 \examples{
+\dontshow{if (identical(tolower(Sys.getenv("NOT_CRAN")), "true")) withAutoprint(\{ # examplesIf}
 # Load demo data shipped with the package
 data_dir <- system.file("extdata", package = "accessibility")
 travel_matrix <- readRDS(file.path(data_dir, "travel_matrix.rds"))
@@ -314,7 +370,7 @@ constrained_accessibility(
 )
 
 # Doubly-constrained: returns units of flow (requires both demand and supply
-# (totals that match) and `detailed_results = TRUE`)
+# with matching totals)
 
 # Using a small toy dataset with matching totals.
 tm_small <- data.table::data.table(
@@ -334,16 +390,26 @@ constrained_accessibility(
   constraint      = "doubly",
   decay_function  = decay_exponential(0.1),
   demand          = "population",
-  supply          = "jobs",
-  detailed_results = TRUE
+  supply          = "jobs"
 )
 
+# With several decay values, each one is balanced separately
+constrained_accessibility(
+  travel_matrix   = tm_small,
+  land_use_data   = lu_small,
+  travel_cost     = "travel_time",
+  constraint      = "doubly",
+  decay_function  = decay_exponential(c(0.1, 0.5)),
+  demand          = "population",
+  supply          = "jobs"
+)
+\dontshow{\}) # examplesIf}
 }
 \references{
 \insertAllCited{}
 }
 \seealso{
-Other Constrained accessibility: 
-\code{\link{spatial_availability}()}
+Other Constrained accessibility:
+\code{\link[=spatial_availability]{spatial_availability()}}
 }
 \concept{Constrained accessibility}

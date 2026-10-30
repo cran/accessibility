@@ -149,7 +149,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; }
 div.csl-bib-body { }
 div.csl-entry {
 clear: both;
-margin-bottom: 0em;
 }
 .hanging div.csl-entry {
 margin-left:2em;
@@ -371,7 +370,7 @@ travel costs become larger. For convenience, the package ships with some
 of the most frequently used functions in the accessibility literature,
 which are discussed below. Additionally, users can pass custom functions
 to convert travel costs into weights to be applied to the opportunities,
-which is discussed further down in this the vignette.</p>
+which is discussed further down in this vignette.</p>
 <div id="currently-available-decay-functions" class="section level1">
 <h1>Currently available decay functions</h1>
 <div id="binary" class="section level2">
@@ -438,7 +437,7 @@ speed of decay.</p>
 <div id="stepped" class="section level2">
 <h2>Stepped</h2>
 <p>Similar to the binary function, but can take an arbitrary number of
-steps. The current implementation assumes that values changes at each
+steps. The current implementation assumes that values change at each
 step, instead of right after it.</p>
 <p><span class="math display">\[
 \begin{aligned}
@@ -503,10 +502,10 @@ but using different negative exponential decay values (0.2 and 0.3):</p>
 <span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="co">#&gt; $`0.3`</span></span>
 <span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="co">#&gt; [1] 0.049787068 0.011108997 0.002478752</span></span></code></pre></div>
-<p><code>decay_stepped()</code>, as the only decay function that takes
-more than one argument (both <code>steps</code> and
-<code>weights</code>) names the output elements after the combination of
-steps and weights:</p>
+<p><code>decay_stepped()</code>, which takes two arguments that can be
+lists of vectors (both <code>steps</code> and <code>weights</code>),
+names the output elements after the combination of steps and
+weights:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>stepped_output <span class="ot">&lt;-</span> <span class="fu">decay_stepped</span>(</span>
 <span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>  <span class="at">steps =</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">30</span>), <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">30</span>, <span class="dv">40</span>)),</span>
 <span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  <span class="at">weights =</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="fl">0.67</span>, <span class="fl">0.33</span>, <span class="dv">0</span>), <span class="fu">c</span>(<span class="fl">0.75</span>, <span class="fl">0.5</span>, <span class="fl">0.25</span>, <span class="dv">0</span>))</span>
@@ -665,16 +664,18 @@ a function.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">decay_power</span>(<span class="dv">1</span>)</span>
 <span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="co">#&gt; function (travel_cost) </span></span>
 <span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a><span class="co">#&gt; {</span></span>
-<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a><span class="co">#&gt;     weights_list &lt;- lapply(decay_value, function(x) {</span></span>
-<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="co">#&gt;         weights &lt;- travel_cost^(-x)</span></span>
-<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a><span class="co">#&gt;         weights[weights &gt; 1] &lt;- 1</span></span>
-<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a><span class="co">#&gt;         weights</span></span>
-<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a><span class="co">#&gt;     })</span></span>
-<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a><span class="co">#&gt;     names(weights_list) &lt;- decay_value</span></span>
-<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a><span class="co">#&gt;     return(weights_list)</span></span>
-<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a><span class="co">#&gt; }</span></span>
-<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a><span class="co">#&gt; &lt;bytecode: 0x00000139faaaf3b8&gt;</span></span>
-<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x0000013a0e8bca88&gt;</span></span></code></pre></div>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a><span class="co">#&gt;     weights_list &lt;- weigh_unique_costs(travel_cost, function(cost) {</span></span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="co">#&gt;         lapply(decay_value, function(x) {</span></span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a><span class="co">#&gt;             weights &lt;- cost^(-x)</span></span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a><span class="co">#&gt;             weights[weights &gt; 1] &lt;- 1</span></span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a><span class="co">#&gt;             weights</span></span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a><span class="co">#&gt;         })</span></span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a><span class="co">#&gt;     })</span></span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a><span class="co">#&gt;     names(weights_list) &lt;- decay_value</span></span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a><span class="co">#&gt;     return(weights_list)</span></span>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a><span class="co">#&gt; }</span></span>
+<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a><span class="co">#&gt; &lt;bytecode: 0x000001830457f548&gt;</span></span>
+<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x00000182be9a2d28&gt;</span></span></code></pre></div>
 <p>What if we want our custom function to take many decay parameters as
 inputs, just like the built-in decay functions? In this case, our output
 function has to return a <code>list</code> of <code>numeric</code>
@@ -744,14 +745,14 @@ function and you want to check its sensitivity to different decay
 parameters, for example, you might be better off developing a decay
 function that can take many decay values as inputs and returns a list of
 weight vectors as output.</p>
-<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-bauer2016measuring" class="csl-entry">
 Bauer, Jan, and David A. Groneberg. 2016. <span>“Measuring <span>Spatial
 Accessibility</span> of <span>Health Care Providers</span> –
 <span>Introduction</span> of a <span>Variable Distance Decay
 Function</span> Within the <span>Floating Catchment Area</span>
-(<span>FCA</span>) <span>Method</span>.”</span> Edited by Kebede Deribe.
-<em>PLOS ONE</em> 11 (7): e0159148. <a href="https://doi.org/10.1371/journal.pone.0159148">https://doi.org/10.1371/journal.pone.0159148</a>.
+(<span>FCA</span>) <span>Method</span>.”</span> <em>PLOS ONE</em> 11
+(7): e0159148. <a href="https://doi.org/10.1371/journal.pone.0159148">https://doi.org/10.1371/journal.pone.0159148</a>.
 </div>
 </div>
 </div>

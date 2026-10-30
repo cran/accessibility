@@ -29,25 +29,43 @@
 #' in the doubly-constrained case (`constraint = "doubly"`).
 #' @template group_by
 #' @template fill_missing_ids_combinations
-#' @param detailed_results Logical. Whether to return detailed OD-level results.
+#' @param detailed_results Logical. Whether to return detailed OD-level
+#' results for `constraint = "total"`- and `constraint = "singly"`
+#' accessibility. Currently ignored for `constraint = "doubly"` accessibility,
+#' which always returns OD-level flows.
 #'
 #'
 #' @section Details:
 #' This function covers the family of constrained accessibility measures
 #' proposed in \insertCite{soukhov2025family;textual}{accessibility}.
 #'
+#' For these measures, each group or decay value is
+#' treated as an independent land-use-transportation system. This is not a multimodal
+#' model that splits demand or supply across groups. Instead, each group is
+#' calculated as if the function were run separately on that group's rows of
+#' `travel_matrix`. The total allocated within a group is the sum of the
+#' opportunities (or population) associated with the ids that appear in that
+#' group's rows.
+#'
+#' As well, when `fill_missing_ids = TRUE`, ids that are absent from a particular
+#' group's rows are still returned with accessibility equal to 0. This doesn't
+#' apply to `constraint = "doubly"`, which ignores `fill_missing_ids` and
+#' returns every origin-destination pair of the ids in each group.
+#'
 #' ## Total Constrained Accessibility
 #'
 #' Allocates the system-wide total proportionally based on travel impedance
 #' between origins and destinations. This measure uses the logic of a
-#' total ~(or 'unconstrained' by Wilson's terms)~ constraint.
+#' total (or 'unconstrained' by Wilson's terms) constraint.
 #'
 #' Use this measure when the total quantity of **supply** OR **demand** in the
 #' system is known and representing accessibility as a proportion of this total
 #'  is meaningful.
 #'
 #' ### Requirement:
-#' - Either `demand` or `supply` must be provided (cannot provide both).
+#' - `supply` must be provided when `active = TRUE`, and `demand` when
+#'   `active = FALSE`. The other argument is ignored, so the same call can be
+#'   used with `constraint = "singly"`, which requires both.
 #'
 #' ### Interpretation:
 #' - `active = TRUE` (*active accessibility*): Results represent the total
@@ -153,10 +171,13 @@
 #' ### Requirements:
 #' - Both `demand` and `supply` must be provided.
 #' - Unlike `total` and `singly`, `doubly` requires the sum of demand and supply
-#' to match; otherwise, the model will not converge.
-#'  - `active` must be `NULL`. Since supply must match demand, their units are
-#'  the same and there is no distinction between 'active' and 'passive' notions.
-#' - Only accepts`detailed_results = TRUE`.
+#'   to match; otherwise, an error is raised. When `group_by` or multiple decay
+#'   values are used, the totals must match within each independently balanced
+#'   system.
+#' - `active` is ignored. Since supply must match demand, their units are
+#'   the same and there is no distinction between 'active' and 'passive' notions.
+#' - `detailed_results` is currently ignored for doubly-constrained
+#'   accessibility. OD-level flows are always returned.
 #'
 #' ### Interpretation:
 #' - Results include OD-level flows (`flow`) along with balancing factors (`A_i`,
@@ -169,12 +190,38 @@
 #' "What is the count of A->1 flows given A->1's region-relative travel impedance,
 #'  demand and supply?"
 #'
+#' @return A data frame of the same class as `travel_matrix` (`data.table`,
+#'   `data.frame` or `tibble`). Its columns depend on `constraint`, `active`
+#'   and `detailed_results`:
+#'
+#' - `constraint = "total"` or `"singly"`, `detailed_results = FALSE`: one
+#'   row per origin (`from_id`, when `active = TRUE`) or destination (`to_id`,
+#'   when `active = FALSE`), plus the `group_by` columns. Accessibility is in a
+#'   column named `supply` (active) or `demand` (passive).
+#' - `constraint = "total"`, `detailed_results = TRUE`: one row per
+#'   origin-destination pair, with the columns `from_id`, `to_id`, the weighted
+#'   opportunities (`weighted_supply` or `weighted_demand`), the share of the
+#'   regional total allocated to the pair (`kappa_total` or `hatkappa_total`),
+#'   the allocated flow (`supply` or `demand`) and the scaling constant
+#'   (`K_total` or `hatK_total`).
+#' - `constraint = "singly"`, `detailed_results = TRUE`: one row per
+#'   origin-destination pair, with the columns `from_id`, `to_id`, the
+#'   allocation share (`kappa_singly` or `hatkappa_singly`), the allocated flow
+#'   (`supply` or `demand`) and the balancing factor (`B_j` or `A_i`).
+#' - `constraint = "doubly"`: one row per origin-destination pair, with the
+#' columns `from_id`, `to_id`, `flow`, the balancing factors `A_i` and `B_j`,
+#' `kappa_doubly` and the final balancing `error`. `detailed_results` and
+#' `active` are not read.
+#'
+#' Detailed results include the `group_by` columns and, when the decay
+#' function has several values, `decay_function_arg`.
+#'
 #' @references
 #' \insertAllCited{}
-
+#'
 #' @family Constrained accessibility
 #'
-#' @examples
+#' @examplesIf identical(tolower(Sys.getenv("NOT_CRAN")), "true")
 #' # Load demo data shipped with the package
 #' data_dir <- system.file("extdata", package = "accessibility")
 #' travel_matrix <- readRDS(file.path(data_dir, "travel_matrix.rds"))
@@ -223,7 +270,7 @@
 #' )
 #'
 #' # Doubly-constrained: returns units of flow (requires both demand and supply
-#' # (totals that match) and `detailed_results = TRUE`)
+#' # with matching totals)
 #'
 #' # Using a small toy dataset with matching totals.
 #' tm_small <- data.table::data.table(
@@ -243,8 +290,18 @@
 #'   constraint      = "doubly",
 #'   decay_function  = decay_exponential(0.1),
 #'   demand          = "population",
-#'   supply          = "jobs",
-#'   detailed_results = TRUE
+#'   supply          = "jobs"
+#' )
+#'
+#' # With several decay values, each one is balanced separately
+#' constrained_accessibility(
+#'   travel_matrix   = tm_small,
+#'   land_use_data   = lu_small,
+#'   travel_cost     = "travel_time",
+#'   constraint      = "doubly",
+#'   decay_function  = decay_exponential(c(0.1, 0.5)),
+#'   demand          = "population",
+#'   supply          = "jobs"
 #' )
 #'
 #' @export
@@ -265,6 +322,8 @@ constrained_accessibility <- function(travel_matrix,
 
   checkmate::assert_choice(constraint, c("total", "singly", "doubly"))
   checkmate::assert_string(travel_cost)
+  checkmate::assert_string(demand, null.ok = TRUE)
+  checkmate::assert_string(supply, null.ok = TRUE)
   assert_decay_function(decay_function)
   assert_group_by(group_by)
   assert_travel_matrix(travel_matrix, travel_cost, group_by)
@@ -291,7 +350,10 @@ constrained_accessibility <- function(travel_matrix,
   }
   # For 'total' and 'singly' we require active to be TRUE or FALSE
   if (is.null(active)) {
-    stop(sprintf("For '%s', active must be TRUE or FALSE.", constraint))
+    cli::cli_abort(
+      "For {.val {constraint}}, active must be TRUE or FALSE.",
+      call = NULL
+    )
   }
 
   # Validate the relevant side (opportunity column) only

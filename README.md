@@ -3,11 +3,11 @@
 
 [![CRAN
 status](https://www.r-pkg.org/badges/version/accessibility)](https://CRAN.R-project.org/package=accessibility)
-[![rcmdcheck](https://github.com/ipeaGIT/accessibility/workflows/rcmdcheck/badge.svg)](https://github.com/ipeaGIT/accessibility/actions)
+[![rcmdcheck](https://github.com/ipea/accessibility/workflows/rcmdcheck/badge.svg)](https://github.com/ipea/accessibility/actions)
 [![CRAN/METACRAN Total
 downloads](https://cranlogs.r-pkg.org/badges/grand-total/accessibility?color=yellow)](https://CRAN.R-project.org/package=accessibility)
 [![Codecov test
-coverage](https://codecov.io/gh/ipeaGIT/accessibility/branch/main/graph/badge.svg)](https://app.codecov.io/gh/ipeaGIT/accessibility?branch=main)
+coverage](https://codecov.io/gh/ipea/accessibility/branch/main/graph/badge.svg)](https://app.codecov.io/gh/ipea/accessibility?branch=main)
 [![Lifecycle:
 stable](https://lifecycle.r-lib.org/articles/figures/lifecycle-stable.svg)](https://lifecycle.r-lib.org/articles/stages.html)
 
@@ -36,20 +36,20 @@ Development version:
 
 ``` r
 # install.packages("remotes")
-remotes::install_github("ipeaGIT/accessibility")
+remotes::install_github("ipea/accessibility")
 ```
 
 ## Usage
 
 This section aims to present a very brief overview of some of the
-packages’ features. Fore more details please read the vignettes:
+package’s features. For more details please read the vignettes:
 
 - [Introduction to **accessibility**: calculating accessibility
-  measures](https://ipeagit.github.io/accessibility/articles/accessibility.html)
+  measures](https://ipea.github.io/accessibility/articles/accessibility.html)
 - [Decay
-  functions](https://ipeagit.github.io/accessibility/articles/decay_functions.html)
+  functions](https://ipea.github.io/accessibility/articles/decay_functions.html)
 - [Calculating accessibility inequality and
-  poverty](https://ipeagit.github.io/accessibility/articles/inequality_and_poverty.html)
+  poverty](https://ipea.github.io/accessibility/articles/inequality_and_poverty.html)
 
 To calculate accessibility levels, one simply needs a pre-calculated
 travel matrix and some land use data. Below we showcase some of the
@@ -71,7 +71,7 @@ cum_cutoff <- cumulative_cutoff(
 )
 head(cum_cutoff)
 #>                 id  jobs
-#>             <char> <int>
+#>             <char> <num>
 #> 1: 89a881a5a2bffff 14561
 #> 2: 89a881a5a2fffff 29452
 #> 3: 89a881a5a67ffff 16647
@@ -148,8 +148,8 @@ poverty
 
 ## Related work:
 
-- [r5r](https://github.com/ipeaGIT/r5r): Rapid Realistic Routing with R5
-  in R
+- [r5r](https://github.com/ipea/r5r): Rapid Realistic Routing with R5 in
+  R
 - [tracc](https://github.com/jamaps/tracc): Transport accessibility
   measures in Python
 - [access](https://access.readthedocs.io/en/latest/): Spatial Access for
